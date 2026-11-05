@@ -1,0 +1,1464 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f6f2">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>JSON Grove · 看清数据的每一层</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2218%22%20fill%3D%22%23d46a46%22%2F%3E%3Cpath%20d%3D%22M25%2016h-4c-4%200-5%203-5%207v3c0%204-2%206-5%206%203%200%205%202%205%206v3c0%204%201%207%205%207h4m14-32h4c4%200%205%203%205%207v3c0%204%202%206%205%206-3%200-5%202-5%206v3c0%204-1%207-5%207h-4%22%20fill%3D%22none%22%20stroke%3D%22%23fffaf3%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E" type="image/svg+xml">
+  <style>:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:#303630;background:#f7f6f2;font-synthesis:none;--tree-indent:28px;--accent:#c76645;--muted:#8a8c82;--border:#e8e8df;--mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+*{box-sizing:border-box}html{height:100%;overflow:hidden}body{margin:0;display:flex;height:100vh;height:100dvh;overflow:hidden}button,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button{border:0;background:none;color:inherit}button:disabled{cursor:default;opacity:.4}button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.65;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}[data-icon]{display:inline-flex;align-items:center;justify-content:center}button{display:inline-flex;align-items:center;justify-content:center;gap:8px}kbd{font-family:inherit;font-size:10px;color:#9a9b91;white-space:nowrap}[hidden]{display:none!important}.sidebar{width:258px;flex-shrink:0;background:#eeeee7;border-right:1px solid #e2e3d9;padding:34px 20px 20px;position:fixed;top:0;bottom:0;display:flex;flex-direction:column;overflow:hidden}.brand{color:#343b31;display:flex;gap:11px;text-decoration:none;align-items:center;margin:0 10px 34px;font-size:21px;letter-spacing:-.7px;font-weight:450}.brand b{font-weight:700}.brand small{display:block;letter-spacing:1.2px;font-size:10px;color:#909186;margin-top:5px}.open-button{background:#354d3e;color:#fff;width:100%;height:44px;border-radius:7px;justify-content:flex-start;padding:0 13px;font-size:12px;box-shadow:0 3px 5px #2b3c2710}.open-button:hover{background:#294332}.open-button kbd{margin-left:auto;color:#c0cabe;font-size:10px}.open-button svg{width:17px}.library-heading{margin:33px 11px 15px;display:flex;align-items:center;gap:8px;font-size:11px;color:#727b6b;letter-spacing:1px}.library-heading>span{font-size:10px;background:#e1e4d9;padding:2px 5px;border-radius:4px;letter-spacing:0}.history-scroll{overflow:auto;flex:1;min-height:0;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#cbd3c0 transparent}.history-section-heading{font-size:10px;color:#919588;margin:17px 11px 9px;display:flex;align-items:center;gap:6px}.history-section-heading svg{width:12px;height:12px}.history-item{position:relative;display:flex;align-items:center;gap:4px;margin:3px 0;border:1px solid transparent;border-radius:6px;min-height:55px;padding:3px 5px}.history-item:hover{background:#e5e7de}.history-item.active{background:#f9f9f3;border-color:#dde1d4;box-shadow:0 1px 2px #39473505}.history-open{min-width:0;flex:1;justify-content:flex-start;gap:9px;text-align:left;padding:7px 4px}.history-open>svg{width:17px;color:#939c87}.history-item.active .history-open>svg{color:#607653}.history-file-text{min-width:0;display:flex;flex-direction:column;gap:5px}.history-file-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.history-file-date{font-size:9px;color:#9b9e92}.history-actions{display:flex;flex-direction:column;gap:2px}.history-actions button{width:21px;height:20px;padding:3px;color:#9b9d90;opacity:0}.history-actions button svg{width:12px;height:12px}.history-item:hover .history-actions button,.history-item:focus-within .history-actions button,.history-actions button.pinned{opacity:1}.history-actions button:hover{color:var(--accent)}.history-actions button.pinned{color:#c17b56}.history-empty{font-size:11px;line-height:1.9;color:#989d8f;padding:10px 12px}.history-empty strong{display:block;color:#76806e;font-weight:500;margin-bottom:6px}main{margin-left:258px;min-width:0;min-height:0;flex:1;display:flex;overflow:hidden;padding:6px 16px}.sidebar-bottom{flex-shrink:0;padding-top:12px}.sidebar>.brand,.sidebar>.open-button,.library-heading,.notice{flex-shrink:0}.sidebar-help{display:flex;align-items:center;justify-content:space-between;padding:3px 10px 0}.help-button{font-size:10px;color:#92988b;padding:6px 0}.help-button svg{width:14px;height:14px}.help-button:hover{color:#536649}.sidebar-readonly{display:flex;align-items:center;gap:4px;font-size:9px;color:#929b84}.sidebar-readonly svg{width:10px;height:10px}.viewer{display:flex;flex-direction:column;flex:1;min-width:0;min-height:0;background:#fffefa;border:1px solid #e1e4d9;border-radius:10px;overflow:hidden;box-shadow:0 5px 20px #444d3310}.file-meta{color:#929b84;font-size:9px;display:flex;align-items:center;justify-content:flex-end;gap:7px;white-space:nowrap}.file-meta .dot{color:#c4c7ba}.sync-indicator{font-size:9px;color:#83916f;display:flex;gap:6px;align-items:center;white-space:nowrap}.sync-indicator i{width:5px;height:5px;background:#91a477;border-radius:50%;display:inline-block}.sync-indicator.warning{color:#b18b50}.sync-indicator.warning i{background:#be9859}.sync-indicator.error{color:#bf6654}.sync-indicator.error i{background:#bf6654}.toolbar{flex-shrink:0;flex-wrap:wrap;border-top:1px solid #eceee5;border-bottom:1px solid #eceee5;background:#fafbf5;display:flex;justify-content:space-between;align-items:center;padding:4px 13px;gap:14px;min-height:40px}.tree-controls{display:flex;flex-wrap:wrap;align-items:center;gap:3px;min-width:0}.level-controls{display:flex;align-items:center;gap:1px}.tree-controls button{white-space:nowrap}.tree-controls button{font-size:10px;color:#79846d;padding:7px 8px;border-radius:4px}.tree-controls button:hover{background:#ecf0e3;color:#475b39}.tree-controls svg{width:13px;height:13px}.toolbar-divider{height:14px;width:1px;background:#dfe4d4;margin:0 6px}.searchbox{margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:6px;border:1px solid #e3e7d9;border-radius:5px;background:#fffefa;height:29px;padding:0 8px;color:#a1a78f;width:252px;min-width:120px}.searchbox:focus-within{border-color:#a9b499;box-shadow:0 0 0 2px #cbd4bc30}.searchbox>span:first-child svg{width:13px;height:13px}.searchbox input{width:100%;min-width:20px;border:none;outline:none;background:transparent;font-size:10px;color:#536448}.searchbox input::placeholder{color:#a3aa95}.searchbox input::-webkit-search-cancel-button{cursor:pointer}.searchbox button{padding:0;color:#869477}.searchbox button svg{width:12px;height:12px}#search-count{font-size:9px;white-space:nowrap}.tree-viewport{flex:1;min-height:0;min-width:0;overflow:auto;padding:3px 0 4px;scrollbar-width:thin;scrollbar-color:#dbe0d1 transparent;position:relative;overscroll-behavior:contain}.tree{min-width:100%;width:max-content;font-family:var(--mono);font-size:12px;line-height:22px;outline:none}.tree-row{display:flex;align-items:center;min-height:22px;white-space:pre;position:relative;padding-right:20px;cursor:default;outline:none}.tree-row:hover{background:#f3f5ed}.tree-row.selected{background:#edf1e5}.tree-row:focus-visible{box-shadow:inset 3px 0 #869977;background:#eef2e6}.tree-row.current-match{background:#f9eddb}.line-number{width:40px;min-width:40px;display:inline-block;color:#c2c6b8;font-size:10px;text-align:right;padding-right:12px;user-select:none;position:sticky;left:0;background:inherit}.tree-indent{display:inline-block;flex-shrink:0;align-self:stretch;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(var(--tree-indent) - 1px),#edf0e7 calc(var(--tree-indent) - 1px),#edf0e7 var(--tree-indent));margin-right:0}.tree-toggle{width:16px;height:20px;flex-shrink:0;padding:0;color:#8e9c80}.tree-toggle svg{width:11px;height:11px;transition:transform .12s}.tree-toggle.expanded svg{transform:rotate(90deg)}.tree-spacer{width:16px;flex-shrink:0}.node-key{color:#657a51;max-width:520px;overflow:hidden;text-overflow:ellipsis}.node-colon{color:#b0b7a3;margin-right:5px}.node-string{color:#b4784f;max-width:850px;overflow:hidden;text-overflow:ellipsis}.node-number{color:#7c85b4}.node-boolean{color:#ab75a3}.node-null{color:#aaa698;font-style:italic}.node-bracket{color:#839078}.node-summary{color:#acb3a0;font-size:10px;margin-left:7px}.array-index{color:#a7ae9a;font-size:11px}.node-trailing{color:#acb4a0}.tree-row mark{background:#f1dba8;color:#805d2b;border-radius:2px}.viewer-footer{min-height:27px;flex-shrink:0;border-top:1px solid #e9ecdf;background:#fafbf6;display:flex;align-items:center;justify-content:space-between;padding:0 14px;gap:15px;font-size:9px;color:#929b84}.selected-path{flex:1;display:flex;align-items:center;gap:9px;min-width:0}.selected-path svg{width:12px;height:12px}.selected-path button{min-width:0;font-family:var(--mono);font-size:10px;padding:3px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:50vw;text-align:left;color:#8b967c}.structure-stats{white-space:nowrap}.drop-zone{border:1px dashed #cfd7c3;border-radius:7px;width:100%;justify-content:flex-start;padding:12px 10px;gap:10px;text-align:left;background:#f3f5ed55}.drop-zone:hover{background:#edf1e5;border-color:#aab99a}.drop-icon{width:28px;height:30px;flex-shrink:0;border:1px solid #e2e6da;background:#f9faf4;border-radius:6px;color:#899879}.drop-icon svg{width:16px;height:16px}.drop-zone strong{font-size:10px;font-weight:500;color:#7b896c;display:block}.drop-zone small{display:block;color:#a4ac97;font-size:9px;margin-top:5px}.notice{max-height:160px;overflow:auto;overscroll-behavior:contain;flex-direction:column;align-items:flex-start;font-size:10px;overflow-wrap:anywhere;line-height:1.8;background:#fff4e2;color:#947146;border:1px solid #ecdfc4;border-radius:6px;padding:10px 11px;margin:12px 0 0;display:flex;gap:5px}.notice span{flex:1}.notice button{white-space:nowrap;text-decoration:underline;padding:4px}.notice.error{background:#fff0e9;color:#b36753;border-color:#efd6ca}.no-results{text-align:center;padding:65px 15px;color:#929b84;font-size:12px}.no-results>span{margin-bottom:15px}.no-results>span svg{width:28px;height:28px}.no-results strong{display:block;font-weight:500}.no-results p{font-size:11px;color:#adb49f}.load-more{display:flex;margin:16px auto;font-size:11px;color:#738861;background:#f0f4e8;padding:9px 18px;border-radius:5px}.drag-overlay{position:fixed;inset:12px;border:2px dashed #7c9165;border-radius:18px;background:#edf3e8ed;z-index:10;display:grid;place-items:center;pointer-events:none;color:#526946;text-align:center;backdrop-filter:blur(5px)}.drag-overlay svg{width:54px;height:54px}.drag-overlay h2{font-size:27px;margin-top:23px}.drag-overlay p{font-size:13px;color:#8b9d7e}.toast{position:fixed;bottom:28px;left:calc(50% + 129px);transform:translateX(-50%);border:1px solid #dce3d3;background:#344b3d;color:#fffdf6;padding:12px 20px;border-radius:8px;font-size:12px;box-shadow:0 4px 20px #26352420;z-index:20;max-width:80vw}.dialog-heading{display:flex;justify-content:space-between;align-items:center}.dialog-heading h2{font-size:20px;margin:0}.dialog-heading button{padding:5px}dialog{border:1px solid #dce2d1;border-radius:12px;padding:28px;max-width:470px;width:calc(100% - 40px);background:#fffefa;color:#526247;box-shadow:0 20px 100px #29341f30}dialog::backdrop{background:#2b352d40;backdrop-filter:blur(3px)}dialog p{font-size:12px;line-height:1.9;color:#87917b}.shortcut-row{display:flex;justify-content:space-between;font-size:11px;padding:10px 0;border-bottom:1px solid #edf0e6}.shortcut-row kbd{color:#8b977d}.help-note{border-top:1px solid #edf0e6;padding-top:12px;margin-bottom:0}
+@media(min-width:1500px){.tree{font-size:13px;line-height:23px}.tree-row{min-height:23px}}
+@media(max-width:1050px){.sidebar{width:220px;padding-left:14px;padding-right:14px}main{margin-left:220px;padding:6px 12px}.searchbox{width:205px}.tree-controls button{padding:7px 5px}.toast{left:calc(50% + 110px)}}
+@media(max-width:790px){.sidebar{width:185px;padding-left:10px;padding-right:10px}.brand{font-size:18px;margin-left:6px;gap:8px}.brand img{width:30px;height:30px}.open-button{font-size:11px;padding:0 10px}.open-button kbd{display:none}main{margin-left:185px;padding:4px 8px}.toolbar{flex-wrap:wrap;gap:6px;padding:5px 10px}.searchbox{width:100%}.tree-controls{width:100%}.sync-indicator{font-size:9px}.line-number{width:40px;min-width:40px;padding-right:12px}.toast{left:calc(50% + 92px)}.drop-zone{padding:10px 8px;gap:7px}.drop-icon{width:24px}.drop-zone small{font-size:8px}}
+@media(max-width:540px){.sidebar{width:142px;padding:18px 8px 12px}.brand{font-size:14px;gap:6px;margin:0 3px 20px;letter-spacing:-.5px}.brand img{width:25px;height:25px}.brand small{display:none}.open-button{height:36px;padding:0 6px;font-size:10px;gap:4px}.open-button svg{width:13px}.library-heading{margin:20px 6px 8px;font-size:10px}.history-item{min-height:43px;padding:3px 1px}.history-open{gap:5px;padding:6px 2px}.history-open>svg{width:13px}.history-file-name{font-size:10px}.history-file-date{font-size:8px}.history-actions button{opacity:1;width:18px;height:18px}.history-empty{font-size:10px;padding:8px 6px}.history-section-heading{margin:12px 6px 5px}.sidebar-bottom{padding-top:8px}.drop-zone{padding:10px 6px;gap:6px}.drop-icon{display:none}.sidebar-help{padding:3px 3px 0}main{margin-left:142px;padding:3px 5px}.file-meta{font-size:8px;gap:5px}.sync-indicator{font-size:9px}.toolbar{padding:4px 6px;gap:5px}.tree-controls{gap:1px;justify-content:space-between}.tree-controls button{font-size:9px;padding:5px 2px;gap:4px}.tree-controls svg{width:11px;height:11px}.toolbar-divider{margin:0 2px}.searchbox{height:29px}.searchbox kbd{display:none}.viewer{border-radius:6px}.viewer-footer{height:auto;min-height:28px;flex-direction:column;align-items:flex-start;justify-content:center;padding:4px 9px;gap:3px}.selected-path{max-width:100%;gap:5px}.selected-path button{max-width:none;font-size:9px}.structure-stats{font-size:8px}.toast{left:50%}.notice{padding:8px;max-height:120px;font-size:9px}.node-summary{font-size:9px}}
+@media(max-height:580px){.sidebar{padding-top:16px;padding-bottom:12px}.brand{margin-bottom:18px}.brand small{display:none}.library-heading{margin-top:18px;margin-bottom:7px}.sidebar-bottom{padding-top:6px}.drop-zone{padding-top:8px;padding-bottom:8px}.notice{max-height:95px}}
+
+.show-value{font-family:inherit;font-size:10px;color:#8b9877;border:1px solid #dce3d2;background:#f6f8ef;border-radius:4px;padding:0 7px;line-height:18px;margin-left:8px}#value-dialog{max-width:780px;width:calc(100% - 40px)}#value-path{font-family:var(--mono);overflow-wrap:anywhere;font-size:11px;max-height:60px;overflow:auto}#full-value{display:block;width:100%;height:42vh;min-height:150px;resize:vertical;background:#f7f9f1;border:1px solid #e0e6d5;border-radius:6px;padding:15px;font-family:var(--mono);font-size:12px;line-height:1.8;color:#687c52;outline:none;tab-size:2}#full-value:focus{border-color:#a3b193}.value-dialog-footer{display:flex;justify-content:space-between;align-items:center;margin-top:15px;font-size:10px;color:#8b987c}.value-dialog-footer button{background:#354d3e;color:#fff;padding:8px 12px;border-radius:5px}.value-dialog-footer svg{width:13px;height:13px}
+.decoded-badge{font-family:inherit;font-size:9px;line-height:16px;margin-left:8px;padding:0 6px;border:1px solid #e5d8c5;border-radius:4px;background:#f8f1e6;color:#ab895d;flex-shrink:0}.decoded-badge:hover{background:#f0e3ce;border-color:#ceb68f}#path-kind{font-size:9px;white-space:nowrap;color:#ab895d;background:#f7f0e3;border-radius:3px;padding:2px 5px}
+
+.footer-info{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:5px 13px;min-width:0;flex-shrink:0;padding:4px 0}.toolbar>.tree-controls{flex:1}.viewer-footer .selected-path button{max-width:100%}.viewer-footer .selected-path{overflow:hidden}.level-controls button{font-size:10px;padding:6px}.level-controls button:hover{background:#ecf0e3}
+@media(max-width:1150px){.toolbar{gap:6px}.toolbar>.tree-controls{flex-basis:100%}.searchbox{width:240px}.viewer-footer{flex-wrap:wrap;gap:0 12px}.footer-info{margin-left:auto}.file-meta{font-size:8px}}
+@media(max-width:790px){.tree-controls{justify-content:flex-start}.level-controls{gap:0}.level-controls button{padding:5px;font-size:9px}.toolbar>.searchbox{width:100%}.footer-info{flex-wrap:wrap;gap:4px 8px}.file-meta{gap:4px}.viewer-footer{padding:3px 10px}.selected-path{min-width:80px}}
+@media(max-width:540px){.viewer-footer{align-items:stretch;gap:2px;padding:3px 8px}.footer-info{margin-left:0;justify-content:flex-start;flex-shrink:1;padding:1px 0}.file-meta{white-space:normal;flex-wrap:wrap;justify-content:flex-start}.tree-controls button{padding:4px}.level-controls{flex-wrap:wrap}.level-controls button{padding:4px 3px}.selected-path{flex:auto}}
+/* JSON appearance; the sidebar layout and indentation stay independent. */
+.viewer .node-url{color:inherit;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:color-mix(in srgb,currentColor 45%,transparent);text-underline-offset:3px;cursor:pointer}.viewer .node-url:hover{text-decoration-style:solid;text-decoration-color:currentColor}
+.viewer,#value-dialog,.theme-preview,.appearance-popover{--json-background:#ffffff;--json-foreground:#303841;--json-key:#1554a1;--json-string:#a33c27;--json-number:#216832;--json-boolean:#7540a0;--json-null:#667080;--json-punctuation:#566478;--json-surface:color-mix(in srgb,var(--json-background) 96%,var(--json-foreground));--json-border:color-mix(in srgb,var(--json-background) 82%,var(--json-foreground));--json-muted:color-mix(in srgb,var(--json-background) 25%,var(--json-foreground));--json-guide:color-mix(in srgb,var(--json-background) 88%,var(--json-foreground));background:var(--json-background);color:var(--json-foreground);border-color:var(--json-border)}
+.viewer .tree-row{background:var(--json-background)}.viewer .tree-row:hover{background:color-mix(in srgb,var(--json-background) 95%,var(--json-foreground))}.viewer .tree-row.selected{background:color-mix(in srgb,var(--json-background) 88%,var(--json-key))}.viewer .tree-row:focus-visible{background:color-mix(in srgb,var(--json-background) 88%,var(--json-key));box-shadow:inset 3px 0 var(--json-key)}.viewer .tree-row.current-match{background:color-mix(in srgb,var(--json-background) 80%,var(--json-number))}.viewer .line-number{color:var(--json-muted)}.viewer .tree-indent{background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(var(--tree-indent) - 1px),var(--json-guide) calc(var(--tree-indent) - 1px),var(--json-guide) var(--tree-indent))}.viewer .tree-toggle{color:var(--json-punctuation)}
+.viewer .node-key,.theme-preview .node-key{color:var(--json-key)}.viewer .node-string,.theme-preview .node-string{color:var(--json-string)}.viewer .node-number,.theme-preview .node-number{color:var(--json-number)}.viewer .node-boolean,.theme-preview .node-boolean{color:var(--json-boolean)}.viewer .node-null,.theme-preview .node-null{color:var(--json-null)}.viewer .node-bracket,.viewer .node-colon,.viewer .node-trailing,.theme-preview .node-bracket{color:var(--json-punctuation)}.viewer .array-index{color:var(--json-muted)}.viewer .tree-row>.node-bracket,.viewer .tree-row>.node-summary{color:color-mix(in srgb,var(--json-background) 80%,var(--json-foreground));font-weight:400}.viewer .tree-row mark{color:var(--json-foreground);background:color-mix(in srgb,var(--json-background) 60%,var(--json-number))}
+.viewer .toolbar,.viewer .viewer-footer{background:var(--json-surface);border-color:var(--json-border)}.viewer .tree-controls button{color:var(--json-muted)}.viewer .tree-controls button:hover{color:var(--json-key);background:color-mix(in srgb,var(--json-background) 88%,var(--json-key))}.viewer .toolbar-divider{background:var(--json-border)}.viewer .searchbox{background:var(--json-background);border-color:var(--json-border);color:var(--json-muted)}.viewer .searchbox:focus-within{border-color:var(--json-key);box-shadow:0 0 0 2px color-mix(in srgb,var(--json-key) 15%,transparent)}.viewer .searchbox input{color:var(--json-foreground)}.viewer .searchbox input::placeholder,.viewer .searchbox button,.viewer kbd,.viewer .file-meta,.viewer .selected-path,.viewer .selected-path button{color:var(--json-muted)}.viewer .file-meta .dot{color:var(--json-punctuation)}.viewer .sync-indicator{color:var(--json-string)}.viewer .sync-indicator i{background:var(--json-string)}.viewer .sync-indicator.warning{color:var(--json-number)}.viewer .sync-indicator.warning i{background:var(--json-number)}.viewer .sync-indicator.error{color:var(--json-error,#bf6654)}.viewer .sync-indicator.error i{background:var(--json-error,#bf6654)}.viewer .decoded-badge,.viewer .show-value,.viewer #path-kind{background:var(--json-surface);border-color:var(--json-border);color:var(--json-number)}.viewer .decoded-badge:hover,.viewer .show-value:hover{background:color-mix(in srgb,var(--json-background) 88%,var(--json-number))}.viewer .tree-viewport{scrollbar-color:var(--json-border) var(--json-background)}.viewer .no-results,.viewer .no-results p{color:var(--json-muted)}.viewer .load-more{background:var(--json-surface);color:var(--json-key)}
+#value-dialog #full-value{background:var(--json-surface);border-color:var(--json-border);color:var(--json-foreground)}#value-dialog #full-value:focus{border-color:var(--json-key)}#value-dialog #value-path,#value-dialog .value-dialog-footer{color:var(--json-muted)}
+#theme-dialog{max-width:600px;max-height:calc(100dvh - 32px);overflow:auto}#theme-dialog>p{font-size:11px;margin:12px 0}.theme-color-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px 16px;margin:16px 0}.theme-color-field{display:flex;align-items:center;gap:7px;min-width:0}.theme-color-field label{font-size:11px;color:#748267;min-width:68px;flex:1}.theme-color-field input[type=color]{width:30px;height:28px;border:1px solid #dce2d1;padding:2px;border-radius:5px;background:#fffefa;cursor:pointer;flex-shrink:0}.theme-hex{font-family:var(--mono);font-size:11px;width:72px;min-width:0;border:1px solid #dce2d1;border-radius:4px;padding:6px 5px;background:#fffefa;color:#637254;outline:none}.theme-hex:focus{border-color:#8a9b79}.theme-preview{margin-top:15px;padding:13px 16px;border:1px solid var(--json-border);border-radius:6px;font-family:var(--mono);font-size:12px;line-height:1.8;overflow:auto;white-space:pre}.theme-dialog-footer{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:11px}.theme-dialog-footer button{padding:8px 12px;border:1px solid #dce2d1;border-radius:5px;color:#78876a}.theme-dialog-footer button:last-child{background:#354d3e;color:#fff;border-color:#354d3e}
+@media(max-width:790px){.theme-color-grid{gap:9px}.theme-color-field label{min-width:60px}}@media(max-width:540px){.theme-color-grid{grid-template-columns:1fr}.theme-color-field label{min-width:68px}#theme-dialog{padding:20px}}
+#editor-dialog{max-width:980px;width:calc(100% - 32px);max-height:calc(100dvh - 30px);overflow:auto}#editor-dialog>p{font-size:11px;line-height:1.7;color:var(--json-muted)}#editor-dialog #json-editor{display:block;width:100%;height:62vh;min-height:180px;resize:vertical;padding:14px;border:1px solid var(--json-border);border-radius:6px;outline:none;background:var(--json-surface);color:var(--json-foreground);font-family:var(--mono);font-size:12px;line-height:1.7;tab-size:2}#editor-dialog #json-editor:focus{border-color:var(--json-key)}.edit-status,#value-dialog .edit-status{font-size:11px;line-height:1.6;margin:10px 0 0;color:var(--json-muted,#7e8c71);max-height:90px;overflow:auto;overflow-wrap:anywhere}.edit-status.edit-error,#value-dialog .edit-status.edit-error{color:var(--json-error,#b44033)}.viewer button.sync-indicator{padding:0;text-align:right;font-size:9px;line-height:1.5;max-width:240px;white-space:normal}.viewer button.sync-indicator:hover{text-decoration:underline}#conflict-dialog{max-width:1000px;max-height:calc(100dvh - 30px);overflow:auto}.conflict-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}.conflict-columns label{font-size:11px;color:#77866a}.conflict-columns textarea{display:block;width:100%;height:45vh;padding:12px;margin-top:8px;border:1px solid #dce3d2;border-radius:5px;background:#f7f9f1;color:#57684b;font-family:var(--mono);font-size:11px;line-height:1.7;resize:vertical}.conflict-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:16px}.conflict-actions button{padding:8px 12px;border:1px solid #dce3d2;border-radius:5px;font-size:11px}.conflict-actions button:last-child{background:#354d3e;color:#fff;border-color:#354d3e}.viewer .node-key,.viewer .node-string,.viewer .node-number,.viewer .node-boolean{cursor:text}@media(max-width:650px){.conflict-columns{grid-template-columns:1fr}.conflict-columns textarea{height:25vh}#editor-dialog{padding:18px}#editor-dialog #json-editor{height:55vh}.viewer button.sync-indicator{max-width:170px}}
+.value-dialog-footer{flex-wrap:wrap;gap:8px}.value-dialog-footer>span{flex:1;min-width:150px}.value-dialog-footer button{font-size:10px;white-space:nowrap}#editor-dialog h2{overflow-wrap:anywhere}
+.viewer .tree{font-size:var(--json-font-size,15px);line-height:calc(var(--json-font-size,15px) + 10px)}.viewer .tree-row{min-height:calc(var(--json-font-size,15px) + 10px)}.viewer .node-summary,.viewer .line-number{font-size:calc(var(--json-font-size,15px) - 2px)}.viewer .array-index{font-size:calc(var(--json-font-size,15px) - 1px)}.viewer .decoded-badge,.viewer .show-value{font-size:max(9px,calc(var(--json-font-size,15px) - 3px));line-height:1.6}#value-dialog #full-value,#editor-dialog #json-editor,#conflict-dialog textarea,.theme-preview{font-size:var(--json-font-size,15px)}
+.toolbar-tools{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;flex-wrap:wrap}.toolbar-tools .searchbox{width:186px;margin-left:0}.viewer .toolbar-tool{height:29px;min-width:32px;flex-shrink:0;border:1px solid var(--json-border);border-radius:5px;padding:0 8px;gap:5px;font-size:10px;color:var(--json-muted);background:var(--json-background)}.viewer .toolbar-tool svg{width:14px;height:14px}.viewer .toolbar-tool:hover,.viewer .toolbar-tool[aria-expanded=true]{color:var(--json-key);border-color:color-mix(in srgb,var(--json-background) 55%,var(--json-key));background:color-mix(in srgb,var(--json-background) 92%,var(--json-key))}.viewer .font-size-button{font-size:17px;gap:0;font-family:var(--mono)}.font-size-button>span{font-size:12px}
+.appearance-popover{position:fixed;inset:auto;margin:0;width:320px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;padding:20px;border:1px solid var(--json-border);border-radius:10px;box-shadow:0 12px 40px #23302020;font:12px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.appearance-popover::backdrop{background:transparent}.appearance-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px;font-size:13px;color:var(--json-muted)}.appearance-heading button{font-size:11px;padding:2px 0;color:var(--json-key)}.appearance-popover select{width:100%;height:34px;padding:0 9px;border:1px solid var(--json-border);border-radius:5px;font:inherit;outline:none;color:var(--json-foreground);background:var(--json-surface)}.appearance-note{font-size:11px;color:color-mix(in srgb,var(--json-background) 40%,var(--json-foreground));margin:15px 0 0;line-height:1.7}.font-size-value{display:flex;align-items:center;gap:4px;color:var(--json-key);font-size:12px}.font-size-value input{width:38px;text-align:right;padding:0;border:0;outline:none;background:transparent;color:inherit;font:inherit;appearance:textfield}.font-size-value input:focus-visible{outline:1px solid var(--json-key);outline-offset:3px;border-radius:2px}.font-size-value input::-webkit-inner-spin-button,.font-size-value input::-webkit-outer-spin-button{appearance:none;margin:0}.font-size-controls{display:flex;align-items:center;gap:16px}.font-size-controls button{width:34px;height:34px;flex-shrink:0;padding:0;border:1px solid var(--json-border);border-radius:7px;background:var(--json-background);color:var(--json-muted);font-size:21px}.font-size-controls button:hover{border-color:var(--json-key);color:var(--json-key)}.font-size-controls input[type=range]{flex:1;min-width:0;width:100%;margin:0;accent-color:var(--json-key);cursor:pointer}.appearance-reset{display:flex;width:100%;border-top:1px solid var(--json-border);margin-top:20px;padding:13px 0 0;color:var(--json-key);font-size:12px}.appearance-popover button:focus-visible,.appearance-popover select:focus-visible{outline:2px solid var(--json-key);outline-offset:3px}
+@media(max-width:790px){.toolbar-tools{width:100%}.toolbar-tools .searchbox{width:170px}}@media(max-width:540px){.toolbar-tools{gap:5px}.toolbar-tools .searchbox{width:auto;flex:1;min-width:90px}.viewer .toolbar-tool{padding:0 6px}.appearance-popover{padding:17px}}
+</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2218%22%20fill%3D%22%23d46a46%22%2F%3E%3Cpath%20d%3D%22M25%2016h-4c-4%200-5%203-5%207v3c0%204-2%206-5%206%203%200%205%202%205%206v3c0%204%201%207%205%207h4m14-32h4c4%200%205%203%205%207v3c0%204%202%206%205%206-3%200-5%202-5%206v3c0%204-1%207-5%207h-4%22%20fill%3D%22none%22%20stroke%3D%22%23fffaf3%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E" alt="" width="36" height="36"><span>JSON <b>Grove</b><small>数据，自有脉络。</small></span></div>
+    <button class="open-button" id="open-file"><span data-icon="plus"></span> 打开 JSON 文件 <kbd>⌘ O</kbd></button>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <div class="library-heading">文件库 <span id="history-count">0</span></div>
+    <div class="history-scroll" id="history-list"></div>
+    <div class="sidebar-bottom">
+      <button class="drop-zone" id="drop-zone"><span class="drop-icon" data-icon="upload"></span><span><strong>拖入 JSON 文件</strong><small>或点击选择 · 最大 20 MB</small></span></button>
+      <div class="sidebar-help"><button class="help-button" id="help-button" title="使用帮助" aria-label="使用帮助"><span data-icon="help"></span>使用帮助</button><span class="sidebar-readonly"><span data-icon="lock"></span><span id="edit-mode">只读</span></span></div>
+    </div>
+  </aside>
+
+  <main aria-label="JSON 查看区">
+      <section class="viewer" aria-label="JSON 文件查看器" hidden>
+        <div class="toolbar"><div class="tree-controls"><button id="expand-all" title="展开全部节点"><span data-icon="expand"></span><span>全部展开</span></button><button id="collapse-all" title="折叠全部节点"><span data-icon="collapse"></span><span>全部折叠</span></button><span class="level-controls" role="group" aria-label="按层级展开"><button data-expand-level="1" title="展开到第一层字段">一级展开</button><button data-expand-level="2" title="展开到第二层字段">二级展开</button><button data-expand-level="3" title="展开到第三层字段">三级展开</button><button data-expand-level="4" title="展开到第四层字段">四级展开</button></span><span class="toolbar-divider"></span><button id="edit-json" title="编辑完整 JSON，停止输入自动保存">编辑 JSON</button><button id="edit-field" title="编辑选中节点（F2 或双击）">编辑字段</button><button id="enable-edit" title="授权读写当前原文件">授权编辑</button><button id="discard-edit" hidden>放弃未保存修改</button><button id="copy-json" title="复制完整 JSON"><span data-icon="copy"></span><span>复制</span></button></div><div class="toolbar-tools"><div class="searchbox"><span data-icon="search"></span><input id="search" type="search" placeholder="搜索字段或值…" aria-label="搜索字段或值" autocomplete="off" spellcheck="false"><span id="search-count"></span><button id="previous-match" title="上一个匹配" aria-label="上一个匹配" hidden><span data-icon="up"></span></button><button id="next-match" title="下一个匹配" aria-label="下一个匹配" hidden><span data-icon="down"></span></button><kbd id="search-hint">⌘ K</kbd></div><button id="theme-button" class="toolbar-tool" popovertarget="theme-popover" title="JSON 配色" aria-label="JSON 配色" aria-expanded="false" aria-controls="theme-popover"><span data-icon="palette"></span><span>配色</span></button><button id="font-size-button" class="toolbar-tool font-size-button" popovertarget="font-popover" title="字体大小" aria-label="调整 JSON 字体大小" aria-expanded="false" aria-controls="font-popover">A<span>a</span></button><button id="indent-button" class="toolbar-tool" popovertarget="indent-popover" title="层级缩进" aria-label="调整 JSON 层级缩进" aria-expanded="false" aria-controls="indent-popover"><span data-icon="indent"></span><span>缩进</span></button></div></div>
+        <div class="tree-viewport" id="tree-viewport"><div class="tree" id="tree" role="tree" aria-label="JSON 结构"></div><div class="no-results" id="no-results" hidden><span data-icon="search"></span><strong>没有找到匹配内容</strong><p>试试其他字段名或值。</p></div><button id="load-more" class="load-more" hidden>继续显示更多节点</button></div>
+        <div class="viewer-footer"><div class="selected-path"><span data-icon="route"></span><span id="path-kind" title="此路径包含从 JSON 字符串解析出的节点，是展示结构中的路径" hidden>解析视图</span><button id="copy-path" title="复制选中节点的 JSONPath">$</button></div><div class="footer-info"><div class="file-meta" id="file-meta"></div><span class="structure-stats" id="structure-stats" hidden></span><button class="sync-indicator" id="sync-status" title="保存状态，点击重试或处理冲突"><i></i></button></div></div>
+      </section>
+  </main>
+  <div id="theme-popover" popover="auto" class="appearance-popover" role="dialog" aria-labelledby="theme-popover-title"><div class="appearance-heading"><label id="theme-popover-title" for="theme-select">JSON 配色</label><button id="customize-theme">自定义配色</button></div><select id="theme-select" aria-label="JSON 配色主题"><option value="grove">自然浅色</option><option value="classic" selected>经典浅色</option><option value="ocean">海洋浅蓝</option><option value="lavender">柔和紫灰</option><option value="midnight">深邃夜色</option></select><p class="appearance-note">即时切换，自动记住上次配色。</p></div>
+  <div id="font-popover" popover="auto" class="appearance-popover" role="dialog" aria-labelledby="font-popover-title"><div class="appearance-heading"><label id="font-popover-title" for="json-font-size">字体大小</label><div class="font-size-value"><input id="json-font-size" type="number" min="10" max="40" step="1" value="15" inputmode="numeric" aria-label="JSON 字号（10 至 40 像素）"><span>px</span></div></div><div class="font-size-controls"><button id="decrease-font-size" title="减小字号" aria-label="减小 JSON 字号">−</button><input id="json-font-range" type="range" min="10" max="40" step="1" value="15" aria-label="滑动调整 JSON 字号"><button id="increase-font-size" title="增大字号" aria-label="增大 JSON 字号">+</button></div><p class="appearance-note">仅调整显示字号，不改变 JSON 内容。</p><button id="reset-font-size" class="appearance-reset">恢复默认字号</button></div>
+  <div id="indent-popover" popover="auto" class="appearance-popover" role="dialog" aria-labelledby="indent-popover-title"><div class="appearance-heading"><label id="indent-popover-title" for="json-indent">层级缩进</label><div class="font-size-value"><input id="json-indent" type="number" min="8" max="64" step="1" value="28" inputmode="numeric" aria-label="JSON 层级缩进（8 至 64 像素）"><span>px</span></div></div><div class="font-size-controls"><button id="decrease-indent" title="减小缩进" aria-label="减小 JSON 缩进">−</button><input id="json-indent-range" type="range" min="8" max="64" step="1" value="28" aria-label="滑动调整 JSON 缩进"><button id="increase-indent" title="增大缩进" aria-label="增大 JSON 缩进">+</button></div><p class="appearance-note">仅调整树形层级间距，不修改 JSON 文件。</p><button id="reset-indent" class="appearance-reset">恢复默认缩进</button></div>
+  <div class="drag-overlay" id="drag-overlay" hidden><div><span data-icon="upload"></span><h2>松开，打开文件</h2><p>一次查看一个 JSON 文件</p></div></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <dialog id="value-dialog"><div class="dialog-heading"><h2 id="value-heading">字段内容</h2><button id="close-value" aria-label="关闭字段内容"><span data-icon="close"></span></button></div><p id="value-path"></p><textarea id="full-value" readonly spellcheck="false" aria-label="完整字段值"></textarea><p id="field-edit-status" class="edit-status" role="status"></p><div class="value-dialog-footer"><span id="value-type"></span><button id="discard-field">放弃未保存修改</button><button id="retry-field">保存 / 处理冲突</button><button id="copy-value"><span data-icon="copy"></span>复制值</button></div></dialog>
+  <dialog id="editor-dialog" aria-labelledby="editor-title"><div class="dialog-heading"><h2 id="editor-title">编辑 JSON</h2><button id="close-editor" aria-label="关闭 JSON 编辑器"><span data-icon="close"></span></button></div><p>支持修改字段名、增加 / 删除字段和调整结构。停止输入约 450 ms 后自动写回原文件，格式错误时不写入。</p><textarea id="json-editor" spellcheck="false" aria-label="JSON 源码编辑器"></textarea><p id="editor-status" class="edit-status" role="status"></p><div class="conflict-actions"><button id="discard-source">放弃未保存修改</button><button id="retry-editor">保存 / 处理冲突</button></div></dialog>
+  <dialog id="conflict-dialog" aria-labelledby="conflict-title"><div class="dialog-heading"><h2 id="conflict-title">网页与原文件都有修改</h2></div><p>自动保存已暂停，两份内容均未覆盖。可以先复制网页草稿；采用原文件会放弃网页未保存修改。</p><div class="conflict-columns"><label>网页草稿<textarea id="conflict-draft" readonly spellcheck="false"></textarea></label><label>当前原文件<textarea id="conflict-disk" readonly spellcheck="false"></textarea></label></div><div class="conflict-actions"><button id="copy-conflict-draft">复制网页草稿</button><button id="keep-conflict">保留草稿，暂不保存</button><button id="use-disk">采用原文件，放弃草稿</button></div></dialog>
+  <dialog id="discard-dialog"><div class="dialog-heading"><h2>放弃未保存的修改？</h2></div><p>将重新读取原文件，并放弃当前网页中的未保存修改。已经写回原文件的内容不会撤销。</p><div class="conflict-actions"><button id="cancel-discard">继续编辑</button><button id="confirm-discard">放弃修改并读取原文件</button></div></dialog>
+  <dialog id="theme-dialog" aria-labelledby="theme-dialog-title"><div class="dialog-heading"><h2 id="theme-dialog-title">自定义 JSON 配色</h2><button id="close-theme" aria-label="关闭配色设置"><span data-icon="close"></span></button></div><p>正在修改「<strong id="theme-editor-name">经典浅色</strong>」。点击色块或输入颜色值，即时预览并自动保存；每套主题可以单独修改。</p><div class="theme-color-grid" id="theme-color-grid"></div><div class="theme-preview" id="theme-preview" aria-label="JSON 配色预览"><span class="node-bracket">{</span>
+  <span class="node-key">"name"</span>: <span class="node-string">"JSON Grove"</span>,
+  <span class="node-key">"count"</span>: <span class="node-number">24</span>,
+  <span class="node-key">"enabled"</span>: <span class="node-boolean">true</span>,
+  <span class="node-key">"empty"</span>: <span class="node-null">null</span>
+<span class="node-bracket">}</span></div><div class="theme-dialog-footer"><button id="reset-theme">恢复当前主题默认配色</button><button id="finish-theme">完成</button></div></dialog>
+  <dialog id="help-dialog"><div class="dialog-heading"><h2>让数据更好读</h2><button id="close-help" aria-label="关闭帮助"><span data-icon="close"></span></button></div><p>点击「打开 JSON 文件」或将文件拖入网页。历史记录保存在当前浏览器中，图钉可将常用文件置顶。</p><p>文件选择窗口会优先从上次打开的位置开始；重新打开网页后，也会参考历史文件的位置。普通文件选择模式下，起始位置由 Edge 自行管理。</p><p>右上方「配色」可以切换主题或自定义颜色；「Aa」可弹出字号面板，用滑块、加减按钮或输入数字调整大小。「缩进」可调整树形层级间距。配色、字号和缩进即时生效并自动记住。</p><p>获得写入授权后，双击节点或点击「编辑字段」可修改值；「编辑 JSON」可修改完整文件，支持字段增删和改名。字符串直接输入文字，其他类型输入有效 JSON。停止输入约 450 ms 后自动写回原文件，格式错误时保留草稿并暂停写入。搜索会自动展开匹配内容所在的路径。</p><p>「一级展开」显示根节点的直接字段；二级到四级逐层深入。搜索期间点击展开级别会清空搜索并切换层级。</p><p>双击 HTML 可独立使用；终端执行 jsonview 文件.json 会自动启动或复用本地服务，直接打开原文件。服务方式需要 Node.js 18+；关闭浏览器后服务继续运行，执行 jsonview --stop 停止服务。页面隐藏时停止文件检查。</p><p>授权读取原文件后，页面可见时约每秒检查一次外部修改。切回页面时也会立即检查。格式错误时保留上次有效的树形视图。</p><p>重新打开浏览器后，历史文件可能需要再次授权。如果当前浏览器限制本地页面的文件读取权限，会改用文件快照并明确提示无法自动同步；可重新选择文件更新内容。</p><div class="shortcut-row"><span>打开文件</span><kbd>⌘ / Ctrl + O</kbd></div><div class="shortcut-row"><span>搜索</span><kbd>⌘ / Ctrl + K</kbd></div><div class="shortcut-row"><span>选择节点后展开 / 收起</span><kbd>← / →</kbd></div><p class="help-note">修改直接写回已授权的原文件，不上传。写入前核对外部修改；存在冲突时暂停保存。关闭页面前请确认状态为「已保存到原文件」。</p></dialog>
+  <input type="file" id="file-input" accept=".json,.jsonc,application/json" hidden>
+  <script>(async function () {
+'use strict';
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+
+function valueType(value) {
+  return value === null ? 'null' : Array.isArray(value) ? 'array' : typeof value;
+}
+
+function jsonPath(parts) {
+  return '$' + parts.map(part => typeof part === 'number' ? `[${part}]` : /^[A-Za-z_$][\w$]*$/.test(part) ? `.${part}` : `[${JSON.stringify(part)}]`).join('');
+}
+
+// Read the number token from the original source to preserve integers beyond 2^53.
+function parseDocument(text) {
+  const raw = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
+  const numbers = new WeakMap();
+  let rootNumberSource;
+  const data = JSON.parse(raw, function (key, value, context) {
+    if (typeof value === 'number' && context?.source) {
+      if (!numbers.has(this)) numbers.set(this, new Map());
+      numbers.get(this).set(key, context.source);
+      rootNumberSource = context.source;
+    }
+    return value;
+  });
+  return { raw, data, numbers, rootNumberSource: typeof data === 'number' ? rootNumberSource : undefined };
+}
+
+function buildIndex(data, sources = {}) {
+  const nodes = [];
+  const totals = { object: 0, array: 0, values: 0 };
+  const stack = [{ value: data, key: '$', parts: [], depth: 0, parent: -1, numberSource: sources.rootNumberSource, sources, inDecodedString: false }];
+  while (stack.length) {
+    const item = stack.pop();
+    if (item.end !== undefined) { nodes[item.end].end = nodes.length; continue; }
+    if (nodes.length >= 100000) throw new Error('文件超过 100,000 个节点，请拆分后查看。');
+    if (item.depth > 512) throw new Error('文件嵌套超过 512 层，请简化结构后查看。');
+    const { sources: itemSources, ...nodeItem } = item;
+    let value = item.value;
+    let childSources = itemSources;
+    let decodedString = false;
+    if (typeof value === 'string') {
+      const candidate = value.trim();
+      // Decode objects and arrays only. Text like "true" or "123" remains text.
+      if (candidate.startsWith('{') || candidate.startsWith('[')) {
+        try {
+          const decoded = parseDocument(candidate);
+          value = decoded.data;
+          childSources = decoded;
+          decodedString = true;
+        } catch { /* Invalid embedded JSON is still a valid ordinary string. */ }
+      }
+    }
+    const type = valueType(value);
+    const container = type === 'object' || type === 'array';
+    const keys = container ? Object.keys(value) : [];
+    const node = { ...nodeItem, value, type, container, decodedString, originalValue: decodedString ? item.value : undefined, count: keys.length, id: JSON.stringify(item.parts), index: nodes.length, end: nodes.length + 1 };
+    if (type === 'number') node.numberSource = item.numberSource ?? String(item.value);
+    nodes.push(node);
+    if (container) totals[type]++; else totals.values++;
+    stack.push({ end: node.index });
+    for (let i = keys.length - 1; i >= 0; i--) {
+      const key = type === 'array' ? Number(keys[i]) : keys[i];
+      stack.push({ value: value[key], key, parts: [...item.parts, key], depth: item.depth + 1, parent: node.index, numberSource: childSources?.numbers?.get(value)?.get(String(key)), sources: childSources, inDecodedString: item.inDecodedString || decodedString });
+    }
+  }
+  return { nodes, totals };
+}
+
+function searchNodes(nodes, query) {
+  const needle = query.toLocaleLowerCase();
+  const matches = [];
+  const included = new Set();
+  if (!needle) return { matches, included };
+  for (const node of nodes) {
+    const value = node.container ? '' : node.type === 'number' ? node.numberSource : String(node.value);
+    if (String(node.key).toLocaleLowerCase().includes(needle) || value.toLocaleLowerCase().includes(needle)) {
+      matches.push(node.index);
+      let index = node.index;
+      while (index !== -1 && !included.has(index)) { included.add(index); index = nodes[index].parent; }
+    }
+  }
+  return { matches, included };
+}
+
+function visibleNodes(nodes, expanded, searchResult, searching, limit) {
+  const rows = [];
+  let more = false;
+  for (let i = 0; i < nodes.length;) {
+    const node = nodes[i];
+    if (searching && !searchResult.included.has(i)) { i = node.end; continue; }
+    if (rows.length >= limit) { more = true; break; }
+    rows.push(node);
+    i = node.container && !searching && !expanded.has(node.id) ? node.end : i + 1;
+  }
+  return { rows, more };
+}
+
+// Level one reveals the root's direct fields; deeper containers stay collapsed.
+function expandedToLevel(nodes, level) {
+  if (!Number.isInteger(level) || level < 1 || level > 4) throw new RangeError('展开级别应为 1–4');
+  return new Set(nodes.filter(node => node.container && node.depth < level).map(node => node.id));
+}
+
+
+
+// Background reads never request permission. Editing requests readwrite explicitly.
+async function readWatchedFile(state, force = false, now = Date.now()) {
+  const file = await state.handle.getFile();
+  if (file.size > MAX_FILE_SIZE) throw new Error('原文件已超过 20 MB，当前保留上次有效视图。');
+  if (!force && file.lastModified === state.lastModified && file.size === state.size && now - state.lastFullRead < 5000) return null;
+  return { file, raw: await file.text(), checkedAt: now };
+}
+
+
+
+// Locate value spans in the original source, so changing a field does not
+// reserialize unrelated numbers, whitespace, key order, or embedded JSON strings.
+function sourceTree(raw) {
+  JSON.parse(raw.replace(/^\uFEFF/, ''));
+  let position = raw.charCodeAt(0) === 0xfeff ? 1 : 0;
+  const skip = () => { while (/\s/.test(raw[position] || '') && position < raw.length) position++; };
+  function read(depth = 0) {
+    if (depth > 512) throw new Error('嵌套超过 512 层。');
+    skip(); const start = position;
+    if (raw[position] === '"') {
+      position++;
+      while (position < raw.length) {
+        if (raw[position] === '\\') { position += 2; continue; }
+        if (raw[position++] === '"') break;
+      }
+      return { start, end: position, type: 'string', value: JSON.parse(raw.slice(start, position)) };
+    }
+    if (raw[position] === '{' || raw[position] === '[') {
+      const array = raw[position++] === '[', close = array ? ']' : '}';
+      const children = new Map(); skip(); let index = 0;
+      while (raw[position] !== close) {
+        let key = index++;
+        if (!array) { key = read(depth + 1).value; skip(); position++; }
+        const child = read(depth + 1); children.set(String(key), child); skip();
+        if (raw[position] !== ',') break;
+        position++; skip();
+      }
+      position++;
+      return { start, end: position, type: array ? 'array' : 'object', children };
+    }
+    while (position < raw.length && !/[\s,}\]]/.test(raw[position])) position++;
+    return { start, end: position, type: 'primitive' };
+  }
+  return read();
+}
+function jsonValueSource(raw, parts) {
+  function visit(node, offset) {
+    if (offset === parts.length) return raw.slice(node.start, node.end);
+    if (node.type === 'string') return jsonValueSource(node.value, parts.slice(offset));
+    const next = node.children?.get(String(parts[offset]));
+    if (!next) throw new Error('该字段已在外部修改或移除，请重新选择。');
+    return visit(next, offset + 1);
+  }
+  return visit(sourceTree(raw), 0);
+}
+function replaceJsonValue(raw, parts, replacement) {
+  JSON.parse(replacement);
+  function visit(node, offset) {
+    if (offset === parts.length) return raw.slice(0, node.start) + replacement + raw.slice(node.end);
+    if (node.type === 'string') {
+      const updated = replaceJsonValue(node.value, parts.slice(offset), replacement);
+      return raw.slice(0, node.start) + JSON.stringify(updated) + raw.slice(node.end);
+    }
+    const next = node.children?.get(String(parts[offset]));
+    if (!next) throw new Error('该字段已在外部修改或移除，请重新选择。');
+    return visit(next, offset + 1);
+  }
+  return visit(sourceTree(raw), 0);
+}
+
+// All writes are serialized and compare disk contents before opening a stream.
+class JsonFileWriter {
+  constructor(handle, diskRaw) { this.handle = handle; this.diskRaw = diskRaw; this.pending = Promise.resolve(); }
+  save(raw) {
+    const operation = this.pending.catch(() => {}).then(async () => {
+      JSON.parse(raw.replace(/^\uFEFF/, ''));
+      if (new Blob([raw]).size > MAX_FILE_SIZE) throw new Error('修改后的文件超过 20 MB。');
+      if (await this.handle.queryPermission({ mode: 'readwrite' }) !== 'granted') throw Object.assign(new Error('写入权限已失效，请点击「授权编辑」重新授权。'), { code: 'WRITE_PERMISSION' });
+      if (typeof this.handle.writeIfUnchanged === 'function') {
+        await this.handle.writeIfUnchanged(this.diskRaw, raw);
+      } else {
+        const latest = await this.handle.getFile();
+        const disk = await latest.text();
+        if (disk !== this.diskRaw) {
+          const error = new Error('原文件在别处有修改，自动保存已暂停。');
+          error.code = 'EXTERNAL_MODIFICATION'; error.diskRaw = disk; throw error;
+        }
+        const stream = await this.handle.createWritable();
+        try { await stream.write(raw); await stream.close(); }
+        catch (error) { try { await stream.abort(); } catch {} throw error; }
+      }
+      this.diskRaw = raw;
+      return await this.handle.getFile().catch(() => null);
+    });
+    this.pending = operation;
+    return operation;
+  }
+}
+
+// Handle adapter for files explicitly registered by the jsonview terminal command.
+class LocalFileHandle {
+  constructor(descriptor) {
+    this.type = 'jsonview-local-file';
+    this.id = descriptor.id; this.token = descriptor.token;
+    this.name = descriptor.name; this.path = descriptor.path;
+  }
+  toStoredHandle() { return { type: this.type, id: this.id, token: this.token, name: this.name, path: this.path }; }
+  async queryPermission() { return 'granted'; }
+  async requestPermission() { return 'granted'; }
+  async isSameEntry(other) { return other?.type === this.type && this.path === other.path; }
+  async call(method = 'GET', body) {
+    let response;
+    try {
+      response = await fetch('/__jsonview/file', {
+        method, cache: 'no-store', credentials: 'omit', signal: AbortSignal.timeout(15000),
+        headers: { 'X-Jsonview-File': this.token, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+        ...(body ? { body: JSON.stringify(body) } : {}),
+      });
+    } catch { throw new Error('本地服务未连接，请在终端重新执行 jsonview 打开原文件。'); }
+    const data = await response.json();
+    if (!response.ok) {
+      const error = new Error(data.error || '原文件读取或保存失败');
+      if (response.status === 409) { error.code = 'EXTERNAL_MODIFICATION'; error.diskRaw = data.content; }
+      throw error;
+    }
+    return data;
+  }
+  async getFile() {
+    const file = await this.call();
+    this.id = file.id; this.name = file.name; this.path = file.path;
+    return { name: file.name, size: file.size, lastModified: file.modified, text: async () => file.content };
+  }
+  async writeIfUnchanged(expectedContent, content) { await this.call('PUT', { expectedContent, content }); }
+}
+
+const $ = id => document.getElementById(id);
+const icons = {
+  indent: '<path d="M4 5h16M11 10h9M11 15h9M4 20h16M3 10l4 2.5L3 15"/>',
+  palette: '<circle cx="12" cy="12" r="9"/><circle cx="8" cy="9" r=".6"/><circle cx="13" cy="7" r=".6"/><circle cx="17" cy="11" r=".6"/><path d="M8 17c1-3 5-4 7-1"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>',
+  braces: '<path d="M8 3H6c-2 0-2 2-2 4v2c0 2-1 3-3 3 2 0 3 1 3 3v2c0 2 0 4 2 4h2m8-18h2c2 0 2 2 2 4v2c0 2 1 3 3 3-2 0-3 1-3 3v2c0 2 0 4-2 4h-2"/>',
+  shield: '<path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6z"/><path d="m8 12 3 3 5-6"/>',
+  lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .5-1.5 1-1.5 2m0 3h.01"/>',
+  expand: '<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M8 8l-5-5m13 5 5-5M8 16l-5 5m13-5 5 5"/>',
+  collapse: '<path d="M3 8h5V3m13 5h-5V3M8 21v-5H3m13 5v-5h5M3 3l5 5m13-5-5 5M3 21l5-5m13 5-5-5"/>',
+  copy: '<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v13h5"/>',
+  search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+  up: '<path d="m6 14 6-6 6 6"/>', down: '<path d="m6 10 6 6 6-6"/>',
+  chevron: '<path d="m9 5 7 7-7 7"/>',
+  route: '<circle cx="6" cy="5" r="2"/><circle cx="18" cy="19" r="2"/><path d="M6 7v9a3 3 0 0 0 3 3h7M6 11h9a3 3 0 0 0 3-3V3"/>',
+  upload: '<path d="M4 15v5h16v-5M12 16V3m-5 5 5-5 5 5"/>',
+  flask: '<path d="M9 3h6m-5 0v6l-6 9a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3l-6-9V3M7 14h10"/>',
+  pin: '<path d="m8 3 8 0-1 7 4 4H5l4-4zM12 14v7"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  close: '<path d="m6 6 12 12M6 18 18 6"/>',
+  file: '<path d="M14 2H5v20h14V7zM14 2v6h5m-11 5h8m-8 4h5"/>',
+};
+function icon(name) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  el.setAttribute('viewBox', '0 0 24 24');
+  el.setAttribute('aria-hidden', 'true');
+  el.innerHTML = icons[name] || icons.file;
+  return el;
+}
+document.querySelectorAll('[data-icon]').forEach(el => el.replaceChildren(icon(el.dataset.icon)));
+if (!/Mac|iPhone|iPad/.test(navigator.platform)) {
+  $('open-file').querySelector('kbd').textContent = 'Ctrl O';
+  $('search-hint').textContent = 'Ctrl K';
+}
+
+// Theme preferences are separate from the history database; no JSON file is changed.
+const THEME_STORAGE_KEY = 'json-grove-appearance-v1';
+const JSON_THEMES = {
+  grove: { name: '自然浅色', colors: { background: '#fffefa', foreground: '#48543e', key: '#657a51', string: '#b4784f', number: '#7c85b4', boolean: '#ab75a3', null: '#aaa698', punctuation: '#839078' } },
+  classic: { name: '经典浅色', colors: { background: '#ffffff', foreground: '#303841', key: '#1554a1', string: '#a33c27', number: '#216832', boolean: '#7540a0', null: '#667080', punctuation: '#566478' } },
+  ocean: { name: '海洋浅蓝', colors: { background: '#f2f8fc', foreground: '#234558', key: '#176486', string: '#996039', number: '#5b55a6', boolean: '#96608b', null: '#657687', punctuation: '#52738b' } },
+  lavender: { name: '柔和紫灰', colors: { background: '#f8f5fc', foreground: '#483c60', key: '#6d4795', string: '#8c5c34', number: '#315eb3', boolean: '#aa3c70', null: '#7c718d', punctuation: '#7d6591' } },
+  midnight: { name: '深邃夜色', colors: { background: '#1e2530', foreground: '#dbe4ee', key: '#8cc9ff', string: '#b8d697', number: '#e6ba7e', boolean: '#ccabf4', null: '#9ba9bb', punctuation: '#b2bfd0' } },
+};
+const JSON_COLOR_LABELS = { background: '背景', foreground: '基础文字', key: '字段名', string: '字符串', number: '数字', boolean: '布尔值', null: '空值 null', punctuation: '括号与标点' };
+const validThemeColor = value => typeof value === 'string' && /^#[\da-f]{6}$/i.test(value);
+function normalizeThemeState(saved) {
+  const state = { selected: 'classic', custom: {} };
+  if (!saved || typeof saved !== 'object') return state;
+  if (Object.hasOwn(JSON_THEMES, saved.selected)) state.selected = saved.selected;
+  for (const id of Object.keys(JSON_THEMES)) {
+    const overrides = saved.custom?.[id];
+    if (!overrides || typeof overrides !== 'object') continue;
+    for (const key of Object.keys(JSON_COLOR_LABELS)) {
+      if (validThemeColor(overrides[key])) (state.custom[id] ??= {})[key] = overrides[key].toLowerCase();
+    }
+  }
+  return state;
+}
+let themeState = normalizeThemeState(null);
+function themeColors() { return { ...JSON_THEMES[themeState.selected].colors, ...themeState.custom[themeState.selected] }; }
+function saveTheme() {
+  try { localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(themeState)); }
+  catch { toast('配色已应用，但浏览器未允许保存设置。'); }
+}
+function applyTheme() {
+  const colors = themeColors();
+  const hex = colors.background.slice(1);
+  const brightness = [0, 2, 4].map(index => parseInt(hex.slice(index, index + 2), 16));
+  const dark = brightness[0] * 0.299 + brightness[1] * 0.587 + brightness[2] * 0.114 < 140;
+  for (const target of [document.querySelector('.viewer'), $('value-dialog'), $('editor-dialog'), $('theme-preview'), $('theme-popover'), $('font-popover'), $('indent-popover')]) {
+    for (const [key, value] of Object.entries(colors)) target.style.setProperty(`--json-${key}`, value);
+    target.style.setProperty('--json-error', dark ? '#ff9c95' : '#b44033');
+    target.style.colorScheme = dark ? 'dark' : 'light';
+  }
+  for (const option of $('theme-select').options) option.textContent = JSON_THEMES[option.value].name + (themeState.custom[option.value] && Object.keys(themeState.custom[option.value]).length ? ' · 自定义' : '');
+  $('theme-select').value = themeState.selected;
+  $('theme-editor-name').textContent = JSON_THEMES[themeState.selected].name;
+}
+function renderThemeEditor() {
+  const colors = themeColors();
+  const fields = document.createDocumentFragment();
+  for (const [key, label] of Object.entries(JSON_COLOR_LABELS)) {
+    const field = document.createElement('div'); field.className = 'theme-color-field';
+    const title = document.createElement('label'); title.htmlFor = `theme-color-${key}`; title.textContent = label;
+    const picker = document.createElement('input'); picker.type = 'color'; picker.id = title.htmlFor; picker.value = colors[key]; picker.dataset.colorKey = key;
+    const hex = document.createElement('input'); hex.type = 'text'; hex.className = 'theme-hex'; hex.value = colors[key]; hex.maxLength = 7; hex.spellcheck = false; hex.autocomplete = 'off'; hex.dataset.colorKey = key; hex.setAttribute('aria-label', `${label}十六进制颜色`);
+    field.append(title, picker, hex); fields.append(field);
+  }
+  $('theme-color-grid').replaceChildren(fields);
+}
+function updateThemeColor(key, value) {
+  if (!Object.hasOwn(JSON_COLOR_LABELS, key) || !validThemeColor(value)) return false;
+  value = value.toLowerCase();
+  const overrides = themeState.custom[themeState.selected] ??= {};
+  if (value === JSON_THEMES[themeState.selected].colors[key]) delete overrides[key]; else overrides[key] = value;
+  if (!Object.keys(overrides).length) delete themeState.custom[themeState.selected];
+  applyTheme();
+  for (const input of $('theme-color-grid').querySelectorAll('[data-color-key]')) if (input.dataset.colorKey === key) input.value = value;
+  saveTheme();
+  return true;
+}
+const FONT_SIZE_STORAGE_KEY = 'json-grove-font-size-v1';
+const DEFAULT_FONT_SIZE = 15, MIN_FONT_SIZE = 10, MAX_FONT_SIZE = 40;
+let jsonFontSize = DEFAULT_FONT_SIZE;
+function applyFontSize(value, persist = true) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number < MIN_FONT_SIZE || number > MAX_FONT_SIZE) return false;
+  jsonFontSize = Math.round(number);
+  for (const target of [document.querySelector('.viewer'), $('value-dialog'), $('editor-dialog'), $('conflict-dialog'), $('theme-preview')]) {
+    target.style.setProperty('--json-font-size', `${jsonFontSize}px`);
+  }
+  $('json-font-size').value = $('json-font-range').value = String(jsonFontSize);
+  $('json-font-range').setAttribute('aria-valuetext', `${jsonFontSize} 像素`);
+  $('decrease-font-size').disabled = jsonFontSize <= MIN_FONT_SIZE;
+  $('increase-font-size').disabled = jsonFontSize >= MAX_FONT_SIZE;
+  if (persist) {
+    try { localStorage.setItem(FONT_SIZE_STORAGE_KEY, String(jsonFontSize)); }
+    catch { toast('字号已应用，但浏览器未允许保存设置。'); }
+  }
+  return true;
+}
+function initFontSize() {
+  let saved;
+  try { saved = localStorage.getItem(FONT_SIZE_STORAGE_KEY); } catch { /* Use the default without browser storage. */ }
+  if (!applyFontSize(saved, false)) applyFontSize(DEFAULT_FONT_SIZE, false);
+  $('decrease-font-size').onclick = () => applyFontSize(jsonFontSize - 1);
+  $('increase-font-size').onclick = () => applyFontSize(jsonFontSize + 1);
+  $('reset-font-size').onclick = () => applyFontSize(DEFAULT_FONT_SIZE);
+  $('json-font-range').oninput = event => applyFontSize(event.target.value);
+  $('json-font-size').oninput = event => {
+    const value = event.target.value;
+    if (value !== '' && Number.isInteger(Number(value))) applyFontSize(value);
+  };
+  $('json-font-size').onchange = event => {
+    const value = Number(event.target.value);
+    applyFontSize(event.target.value === '' || !Number.isFinite(value) ? jsonFontSize : Math.min(MAX_FONT_SIZE, Math.max(MIN_FONT_SIZE, value)));
+  };
+}
+const INDENT_STORAGE_KEY = 'json-grove-indent-v1';
+const DEFAULT_INDENT = 28, MIN_INDENT = 8, MAX_INDENT = 64;
+let jsonIndent = DEFAULT_INDENT;
+function applyIndent(value, persist = true) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number < MIN_INDENT || number > MAX_INDENT) return false;
+  jsonIndent = Math.round(number);
+  document.querySelector('.viewer').style.setProperty('--tree-indent', `${jsonIndent}px`);
+  $('json-indent').value = $('json-indent-range').value = String(jsonIndent);
+  $('json-indent-range').setAttribute('aria-valuetext', `${jsonIndent} 像素`);
+  $('decrease-indent').disabled = jsonIndent <= MIN_INDENT;
+  $('increase-indent').disabled = jsonIndent >= MAX_INDENT;
+  if (persist) {
+    try { localStorage.setItem(INDENT_STORAGE_KEY, String(jsonIndent)); }
+    catch { toast('缩进已应用，但浏览器未允许保存设置。'); }
+  }
+  return true;
+}
+function initIndent() {
+  let saved;
+  try { saved = localStorage.getItem(INDENT_STORAGE_KEY); } catch { /* Keep defaults if storage is unavailable. */ }
+  if (!applyIndent(saved, false)) applyIndent(DEFAULT_INDENT, false);
+  $('decrease-indent').onclick = () => applyIndent(jsonIndent - 1);
+  $('increase-indent').onclick = () => applyIndent(jsonIndent + 1);
+  $('reset-indent').onclick = () => applyIndent(DEFAULT_INDENT);
+  $('json-indent-range').oninput = event => applyIndent(event.target.value);
+  $('json-indent').oninput = event => {
+    if (event.target.value !== '' && Number.isInteger(Number(event.target.value))) applyIndent(event.target.value);
+  };
+  $('json-indent').onchange = event => {
+    const value = Number(event.target.value);
+    applyIndent(event.target.value === '' || !Number.isFinite(value) ? jsonIndent : Math.min(MAX_INDENT, Math.max(MIN_INDENT, value)));
+  };
+}
+function closeAppearancePopovers() {
+  for (const id of ['theme-popover', 'font-popover', 'indent-popover']) {
+    if ($(id).matches?.(':popover-open')) $(id).hidePopover();
+  }
+}
+function positionAppearancePopover(panel, button) {
+  const rect = button.getBoundingClientRect();
+  const width = Math.min(320, window.innerWidth - 24);
+  panel.style.width = `${width}px`;
+  panel.style.left = `${Math.max(12, Math.min(rect.right - width, window.innerWidth - width - 12))}px`;
+  panel.style.top = `${Math.max(12, Math.min(rect.bottom + 8, window.innerHeight - (panel.offsetHeight || 240) - 12))}px`;
+}
+function initAppearancePopovers() {
+  for (const [panelId, buttonId] of [['theme-popover', 'theme-button'], ['font-popover', 'font-size-button'], ['indent-popover', 'indent-button']]) {
+    const panel = $(panelId), button = $(buttonId);
+    panel.addEventListener('beforetoggle', event => {
+      if (event.newState === 'open') positionAppearancePopover(panel, button);
+    });
+    panel.addEventListener('toggle', event => {
+      button.setAttribute('aria-expanded', String(event.newState === 'open'));
+      if (event.newState === 'open') positionAppearancePopover(panel, button);
+    });
+  }
+  window.addEventListener('resize', () => {
+    for (const [panelId, buttonId] of [['theme-popover', 'theme-button'], ['font-popover', 'font-size-button'], ['indent-popover', 'indent-button']]) {
+      if ($(panelId).matches(':popover-open')) positionAppearancePopover($(panelId), $(buttonId));
+    }
+  });
+}
+function initTheme() {
+  try { themeState = normalizeThemeState(JSON.parse(localStorage.getItem(THEME_STORAGE_KEY))); }
+  catch { themeState = normalizeThemeState(null); }
+  applyTheme();
+  $('theme-select').onchange = () => {
+    themeState.selected = $('theme-select').value;
+    applyTheme(); renderThemeEditor(); saveTheme();
+  };
+  $('customize-theme').onclick = () => { closeAppearancePopovers(); renderThemeEditor(); $('theme-dialog').showModal(); };
+  $('close-theme').onclick = $('finish-theme').onclick = () => $('theme-dialog').close();
+  $('theme-color-grid').oninput = event => { updateThemeColor(event.target.dataset.colorKey, event.target.value); };
+  $('theme-color-grid').addEventListener('focusout', event => {
+    if (event.target.matches('.theme-hex') && !validThemeColor(event.target.value)) {
+      event.target.value = themeColors()[event.target.dataset.colorKey];
+      toast('请输入 # 加六位十六进制颜色，例如 #8cc9ff。');
+    }
+  });
+  $('reset-theme').onclick = () => {
+    delete themeState.custom[themeState.selected];
+    applyTheme(); renderThemeEditor(); saveTheme(); toast('已恢复当前主题的默认配色');
+  };
+  initFontSize();
+  initIndent();
+  initAppearancePopovers();
+}
+
+let active = null;
+let nodes = [], totals = {}, expanded = new Set(), selectedId = '[]';
+let query = '', searchResult = { matches: [], included: new Set() }, currentMatch = 0;
+let rowLimit = 1500, generation = 0, pollBusy = false;
+let records = [], db = null, storageAvailable = true, toastTimer, searchTimer;
+let pollTimer, pendingHistoryRecord = null;
+let lastPickerHandle = null;
+const viewStates = new Map();
+
+function toast(message) {
+  clearTimeout(toastTimer);
+  $('toast').textContent = message;
+  $('toast').hidden = false;
+  toastTimer = setTimeout(() => { $('toast').hidden = true; }, 3500);
+}
+function notice(message, action, error = false) {
+  const el = $('notice');
+  el.replaceChildren();
+  el.hidden = !message;
+  el.classList.toggle('error', error);
+  if (!message) return;
+  const text = document.createElement('span');
+  text.textContent = message;
+  el.append(text);
+  if (action) {
+    const button = document.createElement('button');
+    button.textContent = action.label;
+    button.onclick = action.run;
+    el.append(button);
+  }
+}
+function syncStatus(message, state = '') {
+  $('sync-status').className = `sync-indicator ${state}`;
+  $('sync-status').replaceChildren(document.createElement('i'), document.createTextNode(message));
+}
+function sizeLabel(size) { return size < 1024 ? `${size} B` : size < 1048576 ? `${(size / 1024).toFixed(1)} KB` : `${(size / 1048576).toFixed(1)} MB`; }
+function dateLabel(date) { return new Intl.DateTimeFormat('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(date); }
+function renderMetadata() {
+  document.title = active.name;
+  const labels = [sizeLabel(active.size), `${nodes.length.toLocaleString()} 个节点`];
+  if (active.lastModified) labels.push(`修改于 ${dateLabel(active.lastModified)}`);
+  $('file-meta').replaceChildren();
+  labels.forEach((text, index) => {
+    if (index) { const dot = document.createElement('span'); dot.className = 'dot'; dot.textContent = '·'; $('file-meta').append(dot); }
+    const span = document.createElement('span'); span.textContent = text; $('file-meta').append(span);
+  });
+  $('structure-stats').textContent = `${totals.object} 个对象  ·  ${totals.array} 个数组  ·  ${totals.values} 个值`;
+  $('file-meta').title = $('structure-stats').textContent;
+  updateEditStatus();
+}
+
+let editSession = null, editor = null, inputTimer, focusCheckPending = false;
+function editingPending(session = editSession) { return !!session && (session.dirty || session.writing || !!session.editorDraft); }
+function maySwitchFile() {
+  if (!editingPending()) return true;
+  toast('当前有尚未保存的修改，请先保存、处理冲突，或点击「放弃未保存修改」。');
+  return false;
+}
+function updateEditStatus() {
+  const session = editSession;
+  const writable = !!session?.writeAllowed && !!session.writer;
+  $('enable-edit').hidden = writable || !!active?.sample;
+  $('enable-edit').disabled = !active?.handle;
+  $('edit-json').disabled = !writable || !!session?.conflict;
+  $('edit-field').disabled = !writable || !!session?.conflict;
+  $('discard-edit').hidden = !editingPending(session) && !session?.conflict;
+  $('discard-source').disabled = $('discard-field').disabled = !editingPending(session) && !session?.conflict;
+  $('retry-editor').disabled = $('retry-field').disabled = !session?.writer;
+  $('edit-mode').textContent = writable ? '自动保存' : '只读';
+  $('json-editor').readOnly = !writable || !!session?.conflict;
+  if (editor?.session === session && editor.kind === 'field') $('full-value').readOnly = !writable || !!session?.conflict;
+  if (!session || active?.sample) return;
+  let text = '', state = '';
+  if (session.writing) text = '正在写回原文件…';
+  else if (session.conflict) { text = '外部修改冲突 · 点击处理'; state = 'error'; }
+  else if (session.validationError) { text = '格式错误 · 尚未保存'; state = 'error'; }
+  else if (session.error) { text = '保存失败 · 点击重试'; state = 'error'; }
+  else if (editingPending(session)) { text = '等待自动保存…'; state = 'warning'; }
+  else text = writable ? '已保存到原文件' : active.handle && active.syncEnabled ? '自动同步 · 只读' : '历史快照 · 只读';
+  syncStatus(text, state);
+  $('sync-status').title = session.error || '点击检查原文件、重试保存或处理冲突';
+  const hint = session.conflict ? '原文件也有修改，已暂停保存。请在状态栏处理冲突。' : session.validationError || session.error || (session.writing ? '正在写回原文件…' : editingPending(session) ? '停止输入约 450 ms 后自动写回。' : writable ? '已保存到原文件。' : '当前只读，请先授权编辑。');
+  $('editor-status').textContent = hint; $('field-edit-status').textContent = hint;
+  $('editor-status').classList.toggle('edit-error', !!session.conflict || !!session.validationError || !!session.error);
+  $('field-edit-status').classList.toggle('edit-error', !!session.conflict || !!session.validationError || !!session.error);
+}
+async function rememberEditState() {
+  const session = editSession;
+  if (!session || active?.id !== session.id || active.sample) return;
+  const record = records.find(record => record.id === session.id); if (!record) return;
+  Object.assign(record, { raw: session.diskRaw, size: active.size, lastModified: active.lastModified });
+  if (session.dirty || session.editorDraft) record.pendingEdit = { baseRaw: session.diskRaw, raw: active.raw, editorDraft: session.editorDraft };
+  else delete record.pendingEdit;
+  await storeRecord(record);
+}
+function createEditSession(file, diskRaw, writeAllowed) {
+  clearTimeout(inputTimer); clearTimeout(editSession?.saveTimer); editor = null;
+  editSession = { id: file.id, diskRaw, writer: file.handle && (typeof file.handle.createWritable === 'function' || typeof file.handle.writeIfUnchanged === 'function') ? new JsonFileWriter(file.handle, diskRaw) : null, writeAllowed, dirty: false, writing: false, saveTimer: null, error: '', validationError: '', conflict: null, editorDraft: null };
+  updateEditStatus();
+}
+function currentEditorArea() { return editor?.kind === 'source' ? $('json-editor') : $('full-value'); }
+function refreshOpenEditor() {
+  if (!editor || editor.session !== editSession || editingPending()) return;
+  try {
+    if (editor.kind === 'source') currentEditorArea().value = active.raw;
+    else {
+      const token = jsonValueSource(active.raw, editor.parts);
+      const value = JSON.parse(token);
+      editor.asText = typeof value === 'string';
+      currentEditorArea().value = editor.asText ? value : token;
+    }
+  } catch { $('value-dialog').close(); editor = null; toast('正在查看的字段已在外部移除。'); }
+}
+async function grantEditing() {
+  if (!active?.handle || !editSession) { toast('请通过「打开 JSON 文件」选择原文件并授予读写权限。'); return; }
+  const session = editSession, handle = active.handle;
+  try {
+    // Request from this explicit click, never from the background poller.
+    const permission = await handle.requestPermission({ mode: 'readwrite' });
+    if (permission !== 'granted') throw new Error('未获得写入权限，当前保持只读。');
+    if (session !== editSession) return;
+    if (!session.writer) throw new Error('当前浏览器不支持写回原文件，请使用新版 Edge。');
+    session.writeAllowed = true; session.error = '';
+    active.syncEnabled = true; active.lastFullRead = 0;
+    if (session.editorDraft) await processEditorInput();
+    else if (editingPending(session)) await flushSave();
+    else await pollFile(true);
+    updateEditStatus();
+  } catch (error) { toast(error.message); }
+}
+function showSourceEditor() {
+  if (!editSession?.writeAllowed || !editSession.writer) { void grantEditing(); return; }
+  if (editSession.editorDraft?.kind === 'field') {
+    const pendingNode = nodes.find(node => JSON.stringify(node.parts) === JSON.stringify(editSession.editorDraft.parts));
+    if (pendingNode) { showEditableValue(pendingNode.index); return; }
+    toast('有尚未完成的字段草稿，请先保存或放弃修改。'); return;
+  }
+  editor = { kind: 'source', session: editSession };
+  const draft = editSession.editorDraft;
+  $('json-editor').value = draft?.kind === 'source' ? draft.text : active.raw;
+  $('editor-title').textContent = `编辑 JSON · ${active.name}`;
+  $('editor-dialog').showModal(); updateEditStatus();
+}
+function showEditableValue(index) {
+  if (editSession?.editorDraft?.kind === 'source') { showSourceEditor(); return; }
+  if (editSession?.editorDraft?.kind === 'field') {
+    const pendingNode = nodes.find(node => JSON.stringify(node.parts) === JSON.stringify(editSession.editorDraft.parts));
+    if (pendingNode) index = pendingNode.index;
+  }
+  const node = nodes[index]; if (!node) return;
+  const token = jsonValueSource(active.raw, node.parts);
+  const writable = !!editSession?.writeAllowed && !editSession.conflict;
+  editor = { kind: 'field', session: editSession, parts: [...node.parts], asText: node.decodedString || node.type === 'string' };
+  $('value-heading').textContent = `${writable ? '编辑' : '查看'} · ${node.depth ? String(node.key).slice(0, 100) : '根节点'}`;
+  $('value-path').textContent = jsonPath(node.parts);
+  $('full-value').value = editor.asText ? JSON.parse(token) : token;
+  const draft = editSession?.editorDraft;
+  if (draft?.kind === 'field' && JSON.stringify(draft.parts) === JSON.stringify(node.parts)) $('full-value').value = draft.text;
+  $('full-value').readOnly = !writable;
+  $('value-type').textContent = `${node.decodedString ? 'JSON 字符串原文（保存时保持字符串）' : node.type} · ${writable ? '停止输入自动保存' : '只读'}`;
+  $('value-dialog').showModal(); updateEditStatus();
+}
+function queueEditorInput() {
+  if (!editor || editor.session !== editSession || !editSession.writeAllowed || editSession.conflict) return;
+  const text = currentEditorArea().value;
+  editSession.editorDraft = { kind: editor.kind, parts: editor.parts, asText: editor.asText, text };
+  editSession.validationError = ''; editSession.error = '';
+  clearTimeout(inputTimer); clearTimeout(editSession.saveTimer);
+  updateEditStatus(); void rememberEditState();
+  inputTimer = setTimeout(() => { void processEditorInput(); }, 450);
+}
+async function processEditorInput() {
+  clearTimeout(inputTimer);
+  const session = editSession, draft = session?.editorDraft;
+  if (!session || !draft || session.conflict || !session.writeAllowed) return;
+  try {
+    let raw;
+    if (draft.kind === 'source') raw = (session.diskRaw.startsWith('\uFEFF') && !draft.text.startsWith('\uFEFF') ? '\uFEFF' : '') + draft.text;
+    else raw = replaceJsonValue(active.raw, draft.parts, draft.asText ? JSON.stringify(draft.text) : draft.text);
+    if (new Blob([raw]).size > MAX_FILE_SIZE) throw new Error('修改后的文件超过 20 MB。');
+    const parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed);
+    session.editorDraft = null; session.validationError = ''; session.error = '';
+    session.dirty = raw !== session.diskRaw;
+    activate({ ...active, raw }, parsed, true);
+    updateEditStatus(); await rememberEditState();
+    if (session === editSession && session.dirty) await flushSave();
+  } catch (error) {
+    session.validationError = error instanceof SyntaxError ? syntaxError(error, draft.text) : error.message;
+    updateEditStatus(); await rememberEditState();
+  }
+}
+function setFileConflict(diskRaw) {
+  const session = editSession; if (!session) return;
+  clearTimeout(session.saveTimer); session.conflict = { diskRaw }; session.error = '';
+  notice('网页和原文件都有修改，自动保存已暂停。两份内容均保留，请点击右下状态处理。', { label: '查看冲突', run: showConflict }, true);
+  updateEditStatus();
+}
+async function flushSave() {
+  const session = editSession;
+  if (!session || !session.dirty || session.conflict || session.validationError || session.editorDraft) return;
+  if (session.writing) return session.writePromise;
+  if (!session.writer || !session.writeAllowed) { session.error = '请先授权编辑，修改尚未写回。'; updateEditStatus(); return; }
+  const raw = active.raw;
+  session.writing = true; session.error = ''; updateEditStatus();
+  session.writePromise = (async () => {
+    try {
+      const file = await session.writer.save(raw);
+      if (session !== editSession) return;
+      session.diskRaw = raw;
+      session.dirty = active.raw !== raw;
+      active.lastSeenRaw = raw; active.lastFullRead = Date.now();
+      if (file) { active.size = file.size; active.lastModified = file.lastModified; }
+      renderMetadata(); await rememberEditState();
+      if (!session.dirty && !session.editorDraft) notice('');
+    } catch (error) {
+      if (session !== editSession) return;
+      if (error.code === 'EXTERNAL_MODIFICATION') setFileConflict(error.diskRaw);
+      else {
+        session.error = error.message || '原文件写入失败，修改仍保留在页面。';
+        if (error.code === 'WRITE_PERMISSION' || ['NotAllowedError', 'SecurityError'].includes(error.name)) session.writeAllowed = false;
+      }
+      await rememberEditState();
+    } finally {
+      session.writing = false; updateEditStatus();
+    }
+  })();
+  await session.writePromise;
+  if (session !== editSession) return;
+  if (session.dirty && !session.conflict && !session.error && !session.editorDraft && !session.validationError) return flushSave();
+  if (focusCheckPending) { focusCheckPending = false; await pollFile(true); }
+}
+function showConflict() {
+  if (!editSession?.conflict) return;
+  const draft = editSession.editorDraft;
+  $('conflict-draft').value = draft?.kind === 'source' ? draft.text : draft?.kind === 'field' ? `字段 ${jsonPath(draft.parts)} 的未保存输入：\n${draft.text}\n\n当前完整 JSON：\n${active.raw}` : active.raw;
+  $('conflict-disk').value = editSession.conflict.diskRaw;
+  $('conflict-dialog').showModal();
+}
+async function adoptDisk() {
+  if (!active?.handle || editSession?.writing) return;
+  const session = editSession;
+  try {
+    const file = await active.handle.getFile(); const raw = await file.text();
+    if (session !== editSession) return;
+    if (file.size > MAX_FILE_SIZE) throw new Error('原文件超过 20 MB，无法加载。');
+    const parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed);
+    clearTimeout(inputTimer); editor = null;
+    for (const id of ['value-dialog', 'editor-dialog', 'conflict-dialog']) if ($(id).open) $(id).close();
+    session.diskRaw = raw; if (session.writer) session.writer.diskRaw = raw;
+    session.dirty = false; session.editorDraft = null; session.validationError = ''; session.error = ''; session.conflict = null;
+    activate({ ...active, raw, lastSeenRaw: raw, lastFullRead: Date.now(), size: file.size, lastModified: file.lastModified, readFailure: false }, parsed, true);
+    notice(''); updateEditStatus(); await rememberEditState();
+  } catch (error) { toast(`无法采用原文件：${error.message}`); }
+}
+function closeEditor(id) {
+  if (editSession?.editorDraft) {
+    toast('还有未保存的编辑，请修复格式，或点击「放弃未保存修改」。'); return;
+  }
+  $(id).close(); editor = null;
+}
+async function saveNow() {
+  if (editSession?.conflict) { showConflict(); return; }
+  if (!editSession?.writeAllowed) { await grantEditing(); return; }
+  if (editSession.editorDraft) await processEditorInput(); else if (editSession.dirty) await flushSave(); else await resumePoll();
+}
+function restorePendingEdit(record) {
+  const pending = record.pendingEdit;
+  if (!pending || !editSession || typeof pending.raw !== 'string') return;
+  const session = editSession;
+  try {
+    const parsed = parseDocument(pending.raw); parsed.indexed = buildIndex(parsed.data, parsed);
+    session.dirty = pending.raw !== session.diskRaw;
+    session.editorDraft = pending.editorDraft || null;
+    activate({ ...active, raw: pending.raw }, parsed, true);
+    if (pending.baseRaw !== session.diskRaw) { setFileConflict(session.diskRaw); return; }
+    session.error = '已恢复未保存草稿；核对后点击保存状态或按 ⌘ / Ctrl + S 保存。'; updateEditStatus();
+    notice('已恢复上次未保存的修改，不会自动覆盖原文件。请核对后手动保存。', { label: '查看草稿', run: () => {
+      if (session.editorDraft?.kind === 'field') {
+        const node = nodes.find(node => JSON.stringify(node.parts) === JSON.stringify(session.editorDraft.parts));
+        if (node) { showEditableValue(node.index); return; }
+      }
+      showSourceEditor();
+    } });
+  } catch { notice('历史草稿无法解析，原文件未被改动。', null, true); }
+}
+
+async function initStorage() {
+  try {
+    db = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('json-grove', 1);
+      request.onupgradeneeded = () => request.result.createObjectStore('files', { keyPath: 'id' });
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(new Error('历史数据库被其他页面占用'));
+    });
+    db.onversionchange = () => db.close();
+    records = await new Promise((resolve, reject) => {
+      const request = db.transaction('files').objectStore('files').getAll();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    storageAvailable = false;
+    toast('浏览器无法保存历史记录；当前仍可正常查看文件。');
+  }
+  records = records.map(record => ({ ...record, handle: record.handle?.type === 'jsonview-local-file' ? new LocalFileHandle(record.handle) : record.handle }));
+  renderHistory();
+}
+async function storeRecord(record) {
+  if (!db || !storageAvailable) return;
+  try {
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction('files', 'readwrite');
+      tx.objectStore('files').put({ ...record, handle: record.handle?.toStoredHandle ? record.handle.toStoredHandle() : record.handle });
+      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error);
+    });
+  } catch {
+    toast('历史记录保存失败，可能是浏览器存储空间不足。当前文件仍可查看。');
+  }
+}
+async function saveActive() {
+  if (editSession) { await rememberEditState(); return; }
+  if (!active || active.sample) return;
+  const record = records.find(r => r.id === active.id);
+  if (!record) return;
+  Object.assign(record, { raw: active.raw, size: active.size, lastModified: active.lastModified });
+  await storeRecord(record);
+}
+async function removeRecord(id) {
+  if (active?.id === id && !maySwitchFile()) return;
+  records = records.filter(record => record.id !== id);
+  if (active?.id === id) clearViewer();
+  viewStates.delete(id);
+  renderHistory();
+  if (db) {
+    try {
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').delete(id);
+        tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
+      });
+    } catch { toast('无法从浏览器存储中移除该记录。'); }
+  }
+}
+function renderHistory() {
+  $('history-count').textContent = records.length;
+  const list = $('history-list'); list.replaceChildren();
+  if (!records.length) {
+    const empty = document.createElement('div'); empty.className = 'history-empty';
+    const title = document.createElement('strong'); title.textContent = '下一份数据，从这里开始';
+    empty.append(title, document.createTextNode('打开过的文件会出现在这里。点亮图钉，把常用文件留在手边。'));
+    list.append(empty); return;
+  }
+  for (const pinned of [true, false]) {
+    const sectionRecords = records.filter(record => !!record.pinned === pinned).sort((a, b) => b.openedAt - a.openedAt);
+    if (!sectionRecords.length) continue;
+    const heading = document.createElement('div'); heading.className = 'history-section-heading'; heading.append(icon(pinned ? 'pin' : 'clock'), document.createTextNode(pinned ? '已置顶' : '最近打开')); list.append(heading);
+    for (const record of sectionRecords) {
+      const item = document.createElement('div'); item.className = `history-item${active?.id === record.id ? ' active' : ''}`;
+      const open = document.createElement('button'); open.className = 'history-open'; open.title = record.name; open.onclick = () => openHistory(record);
+      const text = document.createElement('span'); text.className = 'history-file-text';
+      const name = document.createElement('span'); name.className = 'history-file-name'; name.textContent = record.name;
+      const date = document.createElement('span'); date.className = 'history-file-date'; date.textContent = `${sizeLabel(record.size)} · ${dateLabel(record.openedAt)}`;
+      text.append(name, date); open.append(icon('file'), text);
+      const actions = document.createElement('div'); actions.className = 'history-actions';
+      const pin = document.createElement('button'); pin.className = record.pinned ? 'pinned' : ''; pin.title = record.pinned ? '取消置顶' : '置顶文件'; pin.setAttribute('aria-label', `${pin.title}：${record.name}`); pin.setAttribute('aria-pressed', String(!!record.pinned)); pin.append(icon('pin'));
+      pin.onclick = () => { record.pinned = !record.pinned; renderHistory(); void storeRecord(record); };
+      const remove = document.createElement('button'); remove.title = '移除历史记录'; remove.setAttribute('aria-label', `移除历史记录：${record.name}`); remove.append(icon('close')); remove.onclick = () => { void removeRecord(record.id); };
+      actions.append(pin, remove); item.append(open, actions); list.append(item);
+    }
+  }
+}
+
+function rememberView() {
+  if (active) viewStates.set(active.id, { expanded: new Set(expanded), selectedId, scrollTop: $('tree-viewport').scrollTop, scrollLeft: $('tree-viewport').scrollLeft, query, rowLimit });
+}
+function activate(file, parsed, keepView = false) {
+  if (!keepView) rememberView();
+  const indexed = parsed.indexed ?? buildIndex(parsed.data, parsed);
+  active = file; nodes = indexed.nodes; totals = indexed.totals;
+  document.querySelector('.viewer').hidden = false;
+  if (!keepView) createEditSession(file, file.raw, !!file.writeAllowed);
+  if (!keepView) {
+    const view = viewStates.get(file.id);
+    expanded = view?.expanded ?? expandedToLevel(nodes, 2);
+    selectedId = view?.selectedId ?? '[]'; query = view?.query ?? ''; rowLimit = view?.rowLimit ?? 1500;
+    $('search').value = query;
+  }
+  // Drop removed paths without resetting existing expansion state.
+  const currentIds = new Set(nodes.map(node => node.id));
+  expanded = new Set([...expanded].filter(id => currentIds.has(id)));
+  if (!currentIds.has(selectedId)) selectedId = '[]';
+  searchResult = searchNodes(nodes, query); currentMatch = 0;
+  renderMetadata(); renderTree(); renderHistory();
+  schedulePoll();
+  if (!keepView) {
+    const view = viewStates.get(file.id);
+    $('tree-viewport').scrollTop = view?.scrollTop ?? 0;
+    $('tree-viewport').scrollLeft = view?.scrollLeft ?? 0;
+  }
+}
+function clearViewer() {
+  closeAppearancePopovers();
+  generation++;
+  clearTimeout(pollTimer); clearTimeout(inputTimer); clearTimeout(editSession?.saveTimer); clearTimeout(searchTimer);
+  active = null; editSession = null; editor = null; focusCheckPending = false;
+  nodes = []; totals = {}; expanded = new Set(); selectedId = '[]';
+  query = ''; searchResult = { matches: [], included: new Set() }; currentMatch = 0; rowLimit = 1500;
+  for (const id of ['editor-dialog', 'value-dialog', 'conflict-dialog', 'discard-dialog']) {
+    if ($(id).open) $(id).close();
+  }
+  $('json-editor').value = $('full-value').value = $('conflict-draft').value = $('conflict-disk').value = '';
+  $('search').value = ''; $('tree').replaceChildren(); $('file-meta').replaceChildren();
+  $('tree-viewport').scrollTop = $('tree-viewport').scrollLeft = 0;
+  $('structure-stats').textContent = ''; $('search-count').textContent = '';
+  $('copy-path').textContent = ''; $('path-kind').hidden = true;
+  $('no-results').hidden = $('load-more').hidden = true;
+  document.title = 'JSON Grove · JSON 查看器';
+  document.querySelector('.viewer').hidden = true;
+  notice(''); syncStatus(''); updateEditStatus();
+}
+function readError(error) {
+  if (error?.name === 'NotFoundError') return '原文件已被移动或删除，请重新打开文件。';
+  if (error?.name === 'NotAllowedError' || error?.name === 'SecurityError') return '读取权限已失效，请重新授权。';
+  return error?.message || '无法读取文件，请重新打开。';
+}
+function syntaxError(error, text) {
+  const match = /position (\d+)/i.exec(error.message);
+  if (match) {
+    const prefix = text.slice(0, Number(match[1]));
+    const line = prefix.split('\n').length;
+    const column = prefix.length - prefix.lastIndexOf('\n');
+    return `JSON 格式错误：第 ${line} 行，第 ${column} 列。${error.message.slice(0, 180)}`;
+  }
+  return `JSON 格式错误：${error.message.slice(0, 180)}`;
+}
+async function loadFile(file, handle = null, knownRecord = null, token = ++generation) {
+  if (!maySwitchFile()) return;
+  if (file.size > MAX_FILE_SIZE) { toast('文件超过 20 MB，请拆分后查看。'); return; }
+  try {
+    const raw = await file.text();
+    if (token !== generation) return;
+    let parsed;
+    try { parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed); }
+    catch (error) { notice(`${file.name}：${error instanceof SyntaxError ? syntaxError(error, raw) : error.message} 当前视图保持不变。`, null, true); return; }
+    let existing = knownRecord;
+    if (!existing && handle) {
+      for (const record of records) {
+        if (!record.handle) continue;
+        try { if (await handle.isSameEntry(record.handle)) { existing = record; break; } } catch { /* Detached handles can still remain in history. */ }
+      }
+    }
+    if (token !== generation) return;
+    if (!existing && !handle) existing = records.find(record => !record.handle && record.name === file.name && record.raw === raw);
+    let writeAllowed = false;
+    if (handle?.createWritable || handle?.writeIfUnchanged) { try { writeAllowed = await handle.queryPermission({ mode: 'readwrite' }) === 'granted'; } catch {} }
+    if (token !== generation) return;
+    const record = existing ?? { id: crypto.randomUUID(), name: file.name, pinned: false };
+    Object.assign(record, { name: file.name, handle, raw, size: file.size, lastModified: file.lastModified, openedAt: Date.now() });
+    if (!existing) records.push(record);
+    activate({ ...record, writeAllowed, syncEnabled: !!handle, lastSeenRaw: raw, lastFullRead: Date.now() }, parsed);
+    if (handle) { notice(''); syncStatus('自动同步中'); }
+    else {
+      notice('浏览器未提供持续读取权限，当前为文件快照，无法自动同步外部修改。重新选择文件可更新内容。', { label: '重新选择', run: () => pickFile(record) });
+      syncStatus('文件快照', 'warning');
+    }
+    restorePendingEdit(record); updateEditStatus();
+    await storeRecord(record);
+  } catch (error) {
+    if (token !== generation) return;
+    notice(readError(error), null, true);
+  }
+}
+// A stable picker ID lets Edge retain its most recently chosen directory.
+// A file handle points the picker at that file's containing directory, without
+// requesting directory-wide access or storing an absolute path.
+function filePickerOptions() {
+  const recent = records.filter(record => record.handle && record.handle.type !== 'jsonview-local-file').reduce((latest, record) => !latest || (record.openedAt || 0) > (latest.openedAt || 0) ? record : latest, null);
+  const startIn = lastPickerHandle || recent?.handle;
+  return {
+    id: 'json-grove-open',
+    mode: 'readwrite',
+    multiple: false,
+    types: [{ description: 'JSON 文件', accept: { 'application/json': ['.json', '.jsonc'] } }],
+    ...(startIn ? { startIn } : {}),
+  };
+}
+async function pickFile(knownRecord = null) {
+  if (!maySwitchFile()) return;
+  const recordToReplace = knownRecord?.id ? knownRecord : null;
+  pendingHistoryRecord = recordToReplace;
+  if (!window.showOpenFilePicker) { $('file-input').click(); return; }
+  try {
+    const options = filePickerOptions();
+    let handles;
+    try { handles = await window.showOpenFilePicker(options); }
+    catch (error) {
+      // A removed file or a stale handle must not prevent opening another file.
+      if (!options.startIn || !['NotFoundError', 'InvalidStateError', 'TypeError'].includes(error.name)) throw error;
+      lastPickerHandle = null;
+      delete options.startIn;
+      handles = await window.showOpenFilePicker(options);
+    }
+    const [handle] = handles;
+    lastPickerHandle = handle;
+    const token = ++generation;
+    const file = await handle.getFile();
+    pendingHistoryRecord = null;
+    await loadFile(file, handle, file.name === recordToReplace?.name ? recordToReplace : null, token);
+  } catch (error) {
+    if (error.name === 'AbortError') { pendingHistoryRecord = null; return; }
+    if (['SecurityError', 'NotAllowedError', 'NotSupportedError'].includes(error.name)) {
+      toast('浏览器限制了持续读取权限，已切换到普通文件选择。');
+      $('file-input').click();
+    } else { pendingHistoryRecord = null; toast(readError(error)); }
+  }
+}
+async function receiveTerminalRequest() {
+  const fragment = window.location?.hash || '';
+  if (!fragment.startsWith('#jsonview=')) return;
+  if (!maySwitchFile()) return;
+  const token = ++generation;
+  try {
+    const capability = new URLSearchParams(fragment.slice(1)).get('jsonview');
+    if (!/^[a-f0-9]{64}$/.test(capability) || !/^http:\/\/127\.0\.0\.1:\d+$/.test(window.location.origin)) throw new Error('命令行链接无效，请重新执行 jsonview 打开文件。');
+    const handle = new LocalFileHandle({ token: capability });
+    const file = await handle.getFile();
+    if (token !== generation) return;
+    await loadFile(file, handle, null, token);
+  } catch (error) {
+    if (token === generation) notice(`命令行文件打开失败：${error.message}`, null, true);
+  }
+}
+async function openHistory(record) {
+  if (!maySwitchFile()) return;
+  const token = ++generation;
+  let authorized = false;
+  try {
+    if (record.handle) {
+      let permission = await record.handle.queryPermission({ mode: 'readwrite' });
+      if (permission !== 'granted') { try { permission = await record.handle.requestPermission({ mode: 'readwrite' }); } catch {} }
+      authorized = permission === 'granted' || await record.handle.queryPermission({ mode: 'read' }) === 'granted';
+      if (authorized) { await loadFile(await record.handle.getFile(), record.handle, record, token); return; }
+    }
+    if (token !== generation) return;
+    activate({ ...record, syncEnabled: false, lastSeenRaw: record.raw }, parseDocument(record.raw));
+    record.openedAt = Date.now(); renderHistory(); void storeRecord(record);
+    restorePendingEdit(record);
+    syncStatus('历史快照', 'warning');
+    notice(record.handle ? '尚未获得原文件读取权限，当前显示上次保存的快照。' : '当前显示历史快照。重新选择原文件可更新内容；是否自动同步取决于浏览器提供的读取权限。', { label: record.handle ? '重新授权' : '打开原文件', run: record.handle ? () => openHistory(record) : () => pickFile(record) });
+  } catch (error) {
+    if (token !== generation) return;
+    if (record.raw !== undefined) {
+      try { activate({ ...record, syncEnabled: false }, parseDocument(record.raw)); } catch { /* Leave the last valid view intact. */ }
+    }
+    syncStatus('同步已暂停', 'error'); notice(`${readError(error)} 当前保留历史快照。`, { label: '重新打开', run: () => pickFile(record) }, true);
+  }
+}
+
+function stringUrls(value) {
+  const links = [];
+  const pattern = /\b(?:https?:\/\/|www\.)[^\s<>"'`\\]+/giu;
+  for (const match of value.matchAll(pattern)) {
+    if (match.index >= 2000) break;
+    let text = match[0];
+    // Leave sentence punctuation and unmatched closing brackets outside the link.
+    while (text) {
+      const last = text.at(-1), pairs = { ')': '(', ']': '[', '}': '{' };
+      if (/[.,;:!?，。；：！？、]/u.test(last)) { text = text.slice(0, -1); continue; }
+      if (pairs[last] && text.split(last).length > text.split(pairs[last]).length) { text = text.slice(0, -1); continue; }
+      break;
+    }
+    try {
+      const url = new URL(/^www\./i.test(text) ? `https://${text}` : text);
+      if (url.protocol === 'http:' || url.protocol === 'https:') links.push({ start: match.index, end: match.index + text.length, href: url.href });
+    } catch { /* Invalid URL: display the original text without a link. */ }
+  }
+  return links;
+}
+function appendHighlighted(el, value, stringValue = null) {
+  const text = value.length > 2000 ? value.slice(0, 2000) + '…' : value;
+  if (stringValue !== null) {
+    let start = 0;
+    for (const link of stringUrls(stringValue)) {
+      const linkStart = JSON.stringify(stringValue.slice(0, link.start)).length - 1;
+      const linkEnd = JSON.stringify(stringValue.slice(0, link.end)).length - 1;
+      if (linkStart >= 2000) break;
+      appendHighlighted(el, text.slice(start, linkStart));
+      const anchor = document.createElement('a'); anchor.className = 'node-url'; anchor.href = link.href;
+      anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; anchor.tabIndex = -1;
+      anchor.title = `⌘ / Ctrl + 单击打开链接\n${link.href}`;
+      appendHighlighted(anchor, text.slice(linkStart, Math.min(linkEnd, text.length)));
+      el.append(anchor); start = Math.min(linkEnd, text.length);
+    }
+    appendHighlighted(el, text.slice(start)); return;
+  }
+  if (!query) { el.append(document.createTextNode(text)); return; }
+  const lower = text.toLocaleLowerCase(), needle = query.toLocaleLowerCase();
+  let start = 0, found;
+  while ((found = lower.indexOf(needle, start)) !== -1) {
+    el.append(document.createTextNode(text.slice(start, found)));
+    const mark = document.createElement('mark'); mark.textContent = text.slice(found, found + query.length); el.append(mark); start = found + query.length;
+  }
+  el.append(document.createTextNode(text.slice(start)));
+}
+function renderTree(focusId) {
+  const top = $('tree-viewport').scrollTop, left = $('tree-viewport').scrollLeft;
+  const { rows, more } = visibleNodes(nodes, expanded, searchResult, !!query, rowLimit);
+  const fragment = document.createDocumentFragment();
+  const matchIndex = searchResult.matches[currentMatch];
+  for (const node of rows) {
+    const row = document.createElement('div');
+    row.className = `tree-row${node.id === selectedId ? ' selected' : ''}${query && node.index === matchIndex ? ' current-match' : ''}`;
+    row.dataset.index = node.index; row.setAttribute('role', 'treeitem'); row.setAttribute('aria-level', node.depth + 1); row.setAttribute('aria-selected', String(node.id === selectedId)); row.tabIndex = node.id === selectedId ? 0 : -1;
+    if (node.container && node.count) row.setAttribute('aria-expanded', String(!!query || expanded.has(node.id)));
+    const number = document.createElement('span'); number.className = 'line-number'; number.textContent = node.index + 1; number.setAttribute('aria-hidden', 'true');
+    const indent = document.createElement('span'); indent.className = 'tree-indent'; indent.style.width = `calc(${node.depth} * var(--tree-indent))`; indent.setAttribute('aria-hidden', 'true');
+    const toggle = document.createElement(node.container && node.count ? 'button' : 'span'); toggle.className = 'tree-spacer';
+    if (node.container && node.count) {
+      toggle.className = `tree-toggle${query || expanded.has(node.id) ? ' expanded' : ''}`; toggle.append(icon('chevron')); toggle.tabIndex = -1;
+      toggle.setAttribute('aria-label', `${query || expanded.has(node.id) ? '收起' : '展开'} ${node.key}`);
+    }
+    row.append(number, indent, toggle);
+    const key = document.createElement('span'); key.className = typeof node.key === 'number' ? 'array-index' : 'node-key'; appendHighlighted(key, node.depth === 0 ? '$' : typeof node.key === 'number' ? String(node.key) : JSON.stringify(node.key));
+    row.append(key);
+    const colon = document.createElement('span'); colon.className = 'node-colon'; colon.textContent = ': '; row.append(colon);
+    const value = document.createElement('span'); value.className = `node-${node.container ? 'bracket' : node.type}`;
+    if (node.container) {
+      value.textContent = node.type === 'array' ? (node.count ? '[ … ]' : '[ ]') : (node.count ? '{ … }' : '{ }');
+      const summary = document.createElement('span'); summary.className = 'node-summary'; summary.textContent = `${node.count} ${node.type === 'array' ? '项' : '个字段'}`;
+      row.append(value, summary);
+      if (node.decodedString) {
+        const badge = document.createElement('button');
+        badge.className = 'decoded-badge'; badge.textContent = 'JSON 字符串';
+        badge.title = '已解析为树形结构，点击查看原始字符串';
+        badge.setAttribute('aria-label', `查看 ${node.key} 的原始 JSON 字符串`);
+        row.append(badge);
+      }
+    } else {
+      const rendered = node.type === 'string' ? JSON.stringify(node.value) : node.type === 'number' ? node.numberSource : String(node.value);
+      appendHighlighted(value, rendered, node.type === 'string' ? node.value : null); value.title = '双击查看完整值'; row.append(value);
+      if (rendered.length > 2000) {
+        const show = document.createElement('button'); show.className = 'show-value'; show.textContent = '查看完整值'; show.dataset.valueIndex = node.index; row.append(show);
+      }
+    }
+    fragment.append(row);
+  }
+  $('tree').replaceChildren(fragment);
+  if (rows.length && !rows.some(node => node.id === selectedId)) $('tree').firstElementChild.tabIndex = 0;
+  $('load-more').hidden = !more;
+  $('no-results').hidden = !query || searchResult.matches.length > 0;
+  $('search-count').textContent = query ? `${searchResult.matches.length ? currentMatch + 1 : 0}/${searchResult.matches.length}` : '';
+  $('search-hint').hidden = !!query;
+  $('previous-match').hidden = $('next-match').hidden = !searchResult.matches.length;
+  const selected = nodes.find(node => node.id === selectedId);
+  $('copy-path').textContent = selected ? jsonPath(selected.parts) : '$';
+  $('copy-path').title = `复制路径：${$('copy-path').textContent}`;
+  $('path-kind').hidden = !selected?.decodedString && !selected?.inDecodedString;
+  $('tree-viewport').scrollTop = top; $('tree-viewport').scrollLeft = left;
+  if (focusId !== undefined) [...$('tree').children].find(row => Number(row.dataset.index) === focusId)?.focus({ preventScroll: true });
+}
+function selectNode(index) {
+  const node = nodes[index]; if (!node) return;
+  selectedId = node.id;
+  $('tree').querySelectorAll('.selected').forEach(row => { row.classList.remove('selected'); row.setAttribute('aria-selected', 'false'); row.tabIndex = -1; });
+  const row = $('tree').querySelector(`[data-index="${index}"]`);
+  if (row) { row.classList.add('selected'); row.setAttribute('aria-selected', 'true'); row.tabIndex = 0; }
+  $('copy-path').textContent = jsonPath(node.parts); $('copy-path').title = `复制路径：${jsonPath(node.parts)}`;
+  $('path-kind').hidden = !node.decodedString && !node.inDecodedString;
+}
+function toggleNode(index) {
+  const node = nodes[index]; if (!node?.container || !node.count) return;
+  if (query) { toast('搜索时自动展开匹配路径，清空搜索后可折叠。'); return; }
+  if (expanded.has(node.id)) expanded.delete(node.id); else expanded.add(node.id);
+  renderTree(index);
+}
+function runSearch() {
+  clearTimeout(searchTimer); query = $('search').value.trim(); currentMatch = 0; rowLimit = 1500;
+  searchResult = searchNodes(nodes, query); renderTree(); if (query) jumpToMatch(0);
+}
+function jumpToMatch(delta) {
+  const matches = searchResult.matches; if (!matches.length) return;
+  currentMatch = (currentMatch + delta + matches.length) % matches.length;
+  const target = matches[currentMatch];
+  // A match past the initial batch must be rendered before it can be scrolled to.
+  let preceding = 0;
+  for (let index = 0; index <= target; index++) if (searchResult.included.has(index)) preceding++;
+  rowLimit = Math.max(rowLimit, preceding);
+  renderTree();
+  $('tree').querySelector(`[data-index="${target}"]`)?.scrollIntoView({ block: 'center', inline: 'nearest' });
+}
+async function copyText(text, message) {
+  try { await navigator.clipboard.writeText(text); toast(message); return; }
+  catch { /* Some file:// contexts do not expose the Clipboard API. */ }
+  const focus = document.activeElement;
+  const area = document.createElement('textarea');
+  area.value = text; area.readOnly = true;
+  area.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+  (document.querySelector('dialog[open]') || document.body).append(area);
+  area.select();
+  let copied = false;
+  try { copied = document.execCommand('copy'); } catch { /* Report failure below. */ }
+  area.remove(); focus?.focus({ preventScroll: true });
+  toast(copied ? message : '复制失败，请允许浏览器访问剪贴板。');
+}
+function showValue(index) { showEditableValue(index); }
+
+async function pollFile(force = false) {
+  if (document.hidden || !active?.handle || !active.syncEnabled) return;
+  if (editSession?.writing || pollBusy) { if (force) focusCheckPending = true; return; }
+  pollBusy = true;
+  const token = generation, fileState = active, session = editSession;
+  try {
+    const snapshot = await readWatchedFile(fileState, force);
+    if (token !== generation || session !== editSession || session?.writing) { if (force) focusCheckPending = true; return; }
+    if (!snapshot) return;
+    const { file, raw, checkedAt } = snapshot;
+    active.lastFullRead = checkedAt;
+    if (raw === session.diskRaw) {
+      active.lastModified = file.lastModified; active.size = file.size;
+      if (active.readFailure) { active.readFailure = false; session.error = ''; notice(''); }
+      if (!session.editorDraft && !session.dirty && session.validationError) { session.validationError = ''; notice(''); }
+      renderMetadata(); updateEditStatus(); return;
+    }
+    if (editingPending(session)) { setFileConflict(raw); await rememberEditState(); return; }
+    if (raw === active.lastSeenRaw && session.validationError) return;
+    active.lastSeenRaw = raw;
+    let parsed;
+    try { parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed); }
+    catch (error) {
+      session.validationError = `原文件格式错误，保留上次有效视图。${error.message}`;
+      notice(`原文件更新，但${error instanceof SyntaxError ? syntaxError(error, raw) : error.message} 修复原文件后会自动更新。`, null, true);
+      updateEditStatus(); return;
+    }
+    session.diskRaw = raw; if (session.writer) session.writer.diskRaw = raw;
+    session.validationError = ''; session.error = ''; session.conflict = null;
+    activate({ ...active, raw, size: file.size, lastModified: file.lastModified, readFailure: false }, parsed, true);
+    refreshOpenEditor(); notice(''); updateEditStatus();
+    await rememberEditState();
+  } catch (error) {
+    if (token !== generation || session !== editSession) return;
+    active.readFailure = true;
+    session.error = readError(error);
+    updateEditStatus();
+    notice(`${readError(error)} 当前内容已保留。`, { label: '重新授权', run: grantEditing }, true);
+  } finally {
+    pollBusy = false;
+    // A focus event may arrive during an existing read. Do one fresh check.
+    if (focusCheckPending && !editSession?.writing) {
+      focusCheckPending = false;
+      if (!document.hidden) void pollFile(true);
+    }
+  }
+}
+
+function schedulePoll() {
+  clearTimeout(pollTimer);
+  if (document.hidden || !active?.handle || !active.syncEnabled) return;
+  pollTimer = setTimeout(async () => {
+    await pollFile();
+    schedulePoll();
+  }, 1000);
+}
+async function resumePoll() {
+  clearTimeout(pollTimer);
+  if (document.hidden) return;
+  await pollFile(true);
+  schedulePoll();
+}
+
+$('open-file').onclick = $('drop-zone').onclick = pickFile;
+$('enable-edit').onclick = grantEditing;
+$('edit-json').onclick = showSourceEditor;
+$('edit-field').onclick = () => { const node = nodes.find(node => node.id === selectedId); if (node) showEditableValue(node.index); };
+$('json-editor').oninput = $('full-value').oninput = queueEditorInput;
+$('close-editor').onclick = () => closeEditor('editor-dialog');
+$('discard-edit').onclick = $('discard-source').onclick = $('discard-field').onclick = () => { $('discard-dialog').showModal(); };
+$('retry-editor').onclick = $('retry-field').onclick = saveNow;
+$('cancel-discard').onclick = () => $('discard-dialog').close();
+$('confirm-discard').onclick = async () => { $('discard-dialog').close(); await adoptDisk(); };
+$('sync-status').onclick = saveNow;
+$('keep-conflict').onclick = () => $('conflict-dialog').close();
+$('use-disk').onclick = adoptDisk;
+$('copy-conflict-draft').onclick = () => copyText($('conflict-draft').value, '已复制网页草稿');
+for (const id of ['editor-dialog', 'value-dialog']) $(id).addEventListener('cancel', event => { event.preventDefault(); closeEditor(id); });
+window.addEventListener('beforeunload', event => { if (editingPending()) { event.preventDefault(); event.returnValue = ''; } });
+$('file-input').onchange = event => {
+  const file = event.target.files[0], record = pendingHistoryRecord;
+  pendingHistoryRecord = null;
+  if (file) void loadFile(file, null, file.name === record?.name ? record : null, ++generation);
+  event.target.value = '';
+};
+$('file-input').oncancel = () => { pendingHistoryRecord = null; };
+$('expand-all').onclick = () => {
+  if (query) { toast('搜索时已展开所有匹配路径。'); return; }
+  expanded = new Set(nodes.filter(node => node.container).map(node => node.id)); rowLimit = 1500; renderTree();
+};
+$('collapse-all').onclick = () => {
+  if (query) { toast('请先清空搜索，再折叠节点。'); return; }
+  expanded.clear(); selectedId = '[]'; renderTree(); $('tree-viewport').scrollTop = 0;
+};
+document.querySelectorAll('[data-expand-level]').forEach(button => {
+  button.onclick = () => {
+    clearTimeout(searchTimer);
+    query = ''; $('search').value = ''; searchResult = searchNodes(nodes, ''); currentMatch = 0;
+    expanded = expandedToLevel(nodes, Number(button.dataset.expandLevel));
+    rowLimit = 1500; selectedId = '[]'; renderTree(); $('tree-viewport').scrollTop = 0;
+  };
+});
+$('copy-json').onclick = () => { if (active) void copyText(active.raw, '已复制完整 JSON 原文'); };
+$('copy-path').onclick = () => copyText($('copy-path').textContent, '已复制节点路径');
+$('load-more').onclick = () => { rowLimit += 1500; renderTree(); };
+$('search').oninput = () => { clearTimeout(searchTimer); searchTimer = setTimeout(runSearch, 120); };
+$('search').onkeydown = event => {
+  if (event.key === 'Enter') { event.preventDefault(); if ($('search').value.trim() !== query) runSearch(); else jumpToMatch(event.shiftKey ? -1 : 1); }
+  if (event.key === 'Escape') { $('search').value = ''; runSearch(); }
+};
+$('previous-match').onclick = () => jumpToMatch(-1);
+$('next-match').onclick = () => jumpToMatch(1);
+$('tree').onclick = event => {
+  const link = event.target.closest('.node-url');
+  if (link) {
+    if (event.button === 0 && (event.metaKey || event.ctrlKey)) return;
+    event.preventDefault();
+  }
+  const row = event.target.closest('.tree-row'); if (!row) return;
+  const index = Number(row.dataset.index); selectNode(index); row.focus({ preventScroll: true });
+  if (event.target.closest('.show-value, .decoded-badge')) { showValue(index); return; }
+  if (event.target.closest('.tree-toggle')) toggleNode(index);
+};
+$('tree').ondblclick = event => {
+  if ((event.metaKey || event.ctrlKey) && event.target.closest('.node-url')) return;
+  const row = event.target.closest('.tree-row'); if (!row || event.target.closest('button')) return;
+  const index = Number(row.dataset.index); showValue(index);
+};
+$('tree').onkeydown = event => {
+  const row = event.target.closest('.tree-row'); if (!row) return;
+  const index = Number(row.dataset.index), node = nodes[index];
+  const rows = [...$('tree').children]; let target;
+  if (event.key === 'ArrowDown') target = rows[rows.indexOf(row) + 1];
+  else if (event.key === 'ArrowUp') target = rows[rows.indexOf(row) - 1];
+  else if (event.key === 'F2') showValue(index);
+  else if (event.key === 'Home') target = rows[0];
+  else if (event.key === 'End') target = rows.at(-1);
+  else if (event.key === 'ArrowRight') {
+    if (node.container && !expanded.has(node.id) && !query) toggleNode(index);
+    else if (node.container && node.count) target = rows[rows.indexOf(row) + 1];
+  } else if (event.key === 'ArrowLeft') {
+    if (node.container && expanded.has(node.id) && !query) toggleNode(index);
+    else target = $('tree').querySelector(`[data-index="${node.parent}"]`);
+  } else if (event.key === 'Enter' || event.key === ' ') { if (node.container) toggleNode(index); else showValue(index); }
+  else return;
+  event.preventDefault();
+  if (target) { selectNode(Number(target.dataset.index)); target.focus({ preventScroll: true }); target.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+};
+document.addEventListener('keydown', event => {
+  if (event.ctrlKey || event.metaKey) {
+    if (event.key.toLowerCase() === 's') { event.preventDefault(); void saveNow(); }
+    if (event.key.toLowerCase() === 'o') { event.preventDefault(); if (!document.querySelector('dialog[open]')) void pickFile(); }
+    if (event.key.toLowerCase() === 'k') { event.preventDefault(); if (active && !document.querySelector('dialog[open]')) { $('search').focus(); $('search').select(); } }
+  }
+});
+$('help-button').onclick = () => $('help-dialog').showModal();
+$('close-help').onclick = () => $('help-dialog').close();
+$('close-value').onclick = () => closeEditor('value-dialog');
+$('copy-value').onclick = () => copyText($('full-value').value, '已复制完整字段值');
+$('help-dialog').onclick = event => { if (event.target === $('help-dialog')) { const rect = event.target.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) event.target.close(); } };
+
+let dragDepth = 0;
+function isFileDrag(event) { return Array.from(event.dataTransfer?.types || []).includes('Files'); }
+document.addEventListener('dragenter', event => { if (isFileDrag(event)) { event.preventDefault(); dragDepth++; $('drag-overlay').hidden = false; } });
+document.addEventListener('dragover', event => { if (isFileDrag(event)) { event.preventDefault(); event.dataTransfer.dropEffect = 'copy'; } });
+document.addEventListener('dragleave', event => { if (isFileDrag(event)) { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) $('drag-overlay').hidden = true; } });
+window.addEventListener('blur', () => { dragDepth = 0; $('drag-overlay').hidden = true; });
+document.addEventListener('drop', async event => {
+  if (!isFileDrag(event)) return;
+  event.preventDefault(); dragDepth = 0; $('drag-overlay').hidden = true;
+  if (!maySwitchFile()) return;
+  const token = ++generation;
+  const items = Array.from(event.dataTransfer.items).filter(item => item.kind === 'file');
+  if (items.length !== 1) { toast('请一次拖入一个 JSON 文件。'); return; }
+  const item = items[0], fallbackFile = item.getAsFile();
+  // Request the handle during the drop event, before the first await.
+  try {
+    const handlePromise = item.getAsFileSystemHandle?.();
+    const handle = handlePromise ? await handlePromise : null;
+    if (handle?.kind === 'directory') { toast('请拖入文件，暂不支持文件夹。'); return; }
+    if (token !== generation) return;
+    const file = handle ? await handle.getFile() : fallbackFile;
+    if (!file) { toast('无法读取这个文件，请使用打开按钮。'); return; }
+    await loadFile(file, handle, null, token);
+  } catch (error) {
+    if (token !== generation) return;
+    if (fallbackFile) await loadFile(fallbackFile, null, null, token); else toast(readError(error));
+  }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) clearTimeout(pollTimer); else void resumePoll();
+});
+window.addEventListener('focus', () => { void resumePoll(); });
+window.addEventListener('pagehide', () => { clearTimeout(pollTimer); });
+window.addEventListener('pageshow', () => { void resumePoll(); });
+initTheme();
+clearViewer();
+await initStorage();
+window.addEventListener('hashchange', () => { void receiveTerminalRequest(); });
+await receiveTerminalRequest();
+
+})().catch(error => {
+  console.error(error);
+  const notice = document.getElementById('notice');
+  notice.hidden = false;
+  notice.textContent = '页面初始化失败，请重新打开 HTML 文件：' + error.message;
+});</script>
+</body>
+</html>

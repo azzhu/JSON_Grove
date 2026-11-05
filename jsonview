@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+import { launchJsonview } from './jsonview-cli.mjs';
+
+launchJsonview(process.argv.slice(2)).catch(error => {
+  console.error(`JSON 查看器：${error.message}`);
+  process.exitCode = 1;
+});
