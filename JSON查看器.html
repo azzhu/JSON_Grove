@@ -37,6 +37,55 @@
 .toolbar-tools{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:7px;min-width:0;flex-wrap:wrap}.toolbar-tools .searchbox{width:186px;margin-left:0}.viewer .toolbar-tool{height:29px;min-width:32px;flex-shrink:0;border:1px solid var(--json-border);border-radius:5px;padding:0 8px;gap:5px;font-size:10px;color:var(--json-muted);background:var(--json-background)}.viewer .toolbar-tool svg{width:14px;height:14px}.viewer .toolbar-tool:hover,.viewer .toolbar-tool[aria-expanded=true]{color:var(--json-key);border-color:color-mix(in srgb,var(--json-background) 55%,var(--json-key));background:color-mix(in srgb,var(--json-background) 92%,var(--json-key))}.viewer .font-size-button{font-size:17px;gap:0;font-family:var(--mono)}.font-size-button>span{font-size:12px}
 .appearance-popover{position:fixed;inset:auto;margin:0;width:320px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow:auto;padding:20px;border:1px solid var(--json-border);border-radius:10px;box-shadow:0 12px 40px #23302020;font:12px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}.appearance-popover::backdrop{background:transparent}.appearance-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px;font-size:13px;color:var(--json-muted)}.appearance-heading button{font-size:11px;padding:2px 0;color:var(--json-key)}.appearance-popover select{width:100%;height:34px;padding:0 9px;border:1px solid var(--json-border);border-radius:5px;font:inherit;outline:none;color:var(--json-foreground);background:var(--json-surface)}.appearance-note{font-size:11px;color:color-mix(in srgb,var(--json-background) 40%,var(--json-foreground));margin:15px 0 0;line-height:1.7}.font-size-value{display:flex;align-items:center;gap:4px;color:var(--json-key);font-size:12px}.font-size-value input{width:38px;text-align:right;padding:0;border:0;outline:none;background:transparent;color:inherit;font:inherit;appearance:textfield}.font-size-value input:focus-visible{outline:1px solid var(--json-key);outline-offset:3px;border-radius:2px}.font-size-value input::-webkit-inner-spin-button,.font-size-value input::-webkit-outer-spin-button{appearance:none;margin:0}.font-size-controls{display:flex;align-items:center;gap:16px}.font-size-controls button{width:34px;height:34px;flex-shrink:0;padding:0;border:1px solid var(--json-border);border-radius:7px;background:var(--json-background);color:var(--json-muted);font-size:21px}.font-size-controls button:hover{border-color:var(--json-key);color:var(--json-key)}.font-size-controls input[type=range]{flex:1;min-width:0;width:100%;margin:0;accent-color:var(--json-key);cursor:pointer}.appearance-reset{display:flex;width:100%;border-top:1px solid var(--json-border);margin-top:20px;padding:13px 0 0;color:var(--json-key);font-size:12px}.appearance-popover button:focus-visible,.appearance-popover select:focus-visible{outline:2px solid var(--json-key);outline-offset:3px}
 @media(max-width:790px){.toolbar-tools{width:100%}.toolbar-tools .searchbox{width:170px}}@media(max-width:540px){.toolbar-tools{gap:5px}.toolbar-tools .searchbox{width:auto;flex:1;min-width:90px}.viewer .toolbar-tool{padding:0 6px}.appearance-popover{padding:17px}}
+/* Interface styles use only --ui-*; JSON colors and typography have their own settings. */
+:root{--ui-page:#f7f6f2;--ui-sidebar:#eeeee7;--ui-surface:#fffefa;--ui-soft:#fafbf5;--ui-text:#526247;--ui-muted:#8b957f;--ui-border:#dce2d1;--ui-accent:#354d3e;--ui-onaccent:#fff;--ui-hover:#e5e7de;--ui-selected:#f9f9f3;--ui-radius:7px;--ui-frame:10px;--ui-shadow:0 5px 20px #444d3310;--ui-font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;--ui-error:#b44033;--ui-warning:#947146}
+body[data-ui-style="default"]{--ui-page:#f7f6f2;--ui-sidebar:#eeeee7;--ui-surface:#fffefa;--ui-soft:#fafbf5;--ui-text:#526247;--ui-muted:#8b957f;--ui-border:#dce2d1;--ui-accent:#354d3e;--ui-onaccent:#ffffff;--ui-hover:#e5e7de;--ui-selected:#f9f9f3;--ui-radius:7px;--ui-frame:10px;--ui-shadow:0 5px 20px #444d3310;--ui-font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color-scheme:light;}
+.style-option[data-style-choice="default"]{--sample-sidebar:#eeeee7;--sample-surface:#fffefa;--sample-border:#dce2d1;--sample-accent:#354d3e;--sample-radius:7px;}
+body[data-ui-style="macintosh"]{--ui-page:#b8b8b8;--ui-sidebar:#efefef;--ui-surface:#ffffff;--ui-soft:#e5e5e5;--ui-text:#161616;--ui-muted:#626262;--ui-border:#222222;--ui-accent:#111111;--ui-onaccent:#ffffff;--ui-hover:#dedede;--ui-selected:#ffffff;--ui-radius:0px;--ui-frame:0px;--ui-shadow:3px 3px 0 #222;--ui-font:Monaco,"Courier New","PingFang SC",monospace;color-scheme:light;}
+.style-option[data-style-choice="macintosh"]{--sample-sidebar:#efefef;--sample-surface:#ffffff;--sample-border:#222222;--sample-accent:#111111;--sample-radius:0px;}
+body[data-ui-style="windows95"]{--ui-page:#008080;--ui-sidebar:#c0c0c0;--ui-surface:#dfdfdf;--ui-soft:#c0c0c0;--ui-text:#111111;--ui-muted:#4c4c4c;--ui-border:#808080;--ui-accent:#000080;--ui-onaccent:#ffffff;--ui-hover:#d6d6d6;--ui-selected:#ffffff;--ui-radius:0px;--ui-frame:0px;--ui-shadow:2px 2px 0 #003e3e;--ui-font:Tahoma,"Microsoft Sans Serif","PingFang SC",sans-serif;color-scheme:light;}
+.style-option[data-style-choice="windows95"]{--sample-sidebar:#c0c0c0;--sample-surface:#dfdfdf;--sample-border:#808080;--sample-accent:#000080;--sample-radius:0px;}
+body[data-ui-style="newspaper"]{--ui-page:#e9e2d2;--ui-sidebar:#eee7d7;--ui-surface:#faf5e9;--ui-soft:#f0eadc;--ui-text:#302b24;--ui-muted:#807363;--ui-border:#a69b85;--ui-accent:#8d342a;--ui-onaccent:#fff9ed;--ui-hover:#e6ddca;--ui-selected:#fbf6ea;--ui-radius:1px;--ui-frame:1px;--ui-shadow:0 3px 12px #46341c12;--ui-font:Georgia,"Songti SC","SimSun",serif;color-scheme:light;}
+.style-option[data-style-choice="newspaper"]{--sample-sidebar:#eee7d7;--sample-surface:#faf5e9;--sample-border:#a69b85;--sample-accent:#8d342a;--sample-radius:1px;}
+body[data-ui-style="archive"]{--ui-page:#dcd5c2;--ui-sidebar:#e5decb;--ui-surface:#f8f2df;--ui-soft:#eee6d0;--ui-text:#354738;--ui-muted:#7c8068;--ui-border:#b4b69a;--ui-accent:#3f5b49;--ui-onaccent:#fff9e8;--ui-hover:#d8d7bd;--ui-selected:#f7f0d9;--ui-radius:3px;--ui-frame:4px;--ui-shadow:0 4px 16px #3b42231a;--ui-font:"Courier New","Songti SC",monospace;color-scheme:light;}
+.style-option[data-style-choice="archive"]{--sample-sidebar:#e5decb;--sample-surface:#f8f2df;--sample-border:#b4b69a;--sample-accent:#3f5b49;--sample-radius:3px;}
+body[data-ui-style="computer80"]{--ui-page:#0b110e;--ui-sidebar:#121d16;--ui-surface:#17241b;--ui-soft:#101b14;--ui-text:#b3e8b2;--ui-muted:#75a981;--ui-border:#355e40;--ui-accent:#a4e69c;--ui-onaccent:#101b14;--ui-hover:#213b28;--ui-selected:#264530;--ui-radius:1px;--ui-frame:2px;--ui-shadow:0 0 0 1px #0a100c,0 8px 30px #0005;--ui-font:"SFMono-Regular",Consolas,"Liberation Mono","PingFang SC",monospace;color-scheme:dark;--ui-error:#ff9c95;--ui-warning:#e6ba7e;}
+.style-option[data-style-choice="computer80"]{--sample-sidebar:#121d16;--sample-surface:#17241b;--sample-border:#355e40;--sample-accent:#a4e69c;--sample-radius:1px;}
+body[data-ui-style="developer"]{--ui-page:#181818;--ui-sidebar:#202020;--ui-surface:#292929;--ui-soft:#242424;--ui-text:#d4d4d4;--ui-muted:#a0a0a0;--ui-border:#414141;--ui-accent:#087bc2;--ui-onaccent:#ffffff;--ui-hover:#303030;--ui-selected:#343a40;--ui-radius:3px;--ui-frame:3px;--ui-shadow:none;--ui-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;color-scheme:dark;--ui-error:#ff9c95;--ui-warning:#e6ba7e;}
+.style-option[data-style-choice="developer"]{--sample-sidebar:#202020;--sample-surface:#292929;--sample-border:#414141;--sample-accent:#087bc2;--sample-radius:3px;}
+body[data-ui-style="linear"]{--ui-page:#f8f9fc;--ui-sidebar:#f0f1f6;--ui-surface:#ffffff;--ui-soft:#f8f9fc;--ui-text:#333744;--ui-muted:#8a8e9d;--ui-border:#e1e3ec;--ui-accent:#6356cc;--ui-onaccent:#ffffff;--ui-hover:#e8e9f1;--ui-selected:#ffffff;--ui-radius:6px;--ui-frame:8px;--ui-shadow:0 4px 24px #272d4a0a;--ui-font:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;color-scheme:light;}
+.style-option[data-style-choice="linear"]{--sample-sidebar:#f0f1f6;--sample-surface:#ffffff;--sample-border:#e1e3ec;--sample-accent:#6356cc;--sample-radius:6px;}
+body[data-ui-style="notion"]{--ui-page:#ffffff;--ui-sidebar:#f7f7f5;--ui-surface:#ffffff;--ui-soft:#fbfbfa;--ui-text:#37352f;--ui-muted:#96948e;--ui-border:#e9e8e5;--ui-accent:#37352f;--ui-onaccent:#ffffff;--ui-hover:#efefec;--ui-selected:#e9e9e5;--ui-radius:4px;--ui-frame:3px;--ui-shadow:none;--ui-font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif;color-scheme:light;}
+.style-option[data-style-choice="notion"]{--sample-sidebar:#f7f7f5;--sample-surface:#ffffff;--sample-border:#e9e8e5;--sample-accent:#37352f;--sample-radius:4px;}
+body{background:var(--ui-page);color:var(--ui-text);font-family:var(--ui-font)}
+body .sidebar{background:var(--ui-sidebar);border-color:var(--ui-border)}
+body .brand{color:var(--ui-text)}body .brand small,body .history-section-heading,body .history-file-date,body .history-empty,body .history-empty strong,body .sidebar-readonly,body .help-button{color:var(--ui-muted)}
+body .open-button{background:var(--ui-accent);color:var(--ui-onaccent);border:1px solid transparent;border-radius:var(--ui-radius)}body .open-button:hover{background:color-mix(in srgb,var(--ui-accent) 90%,var(--ui-text))}body .open-button kbd{color:var(--ui-onaccent);opacity:.75}
+body .history-item{border-radius:var(--ui-radius)}body .history-item:hover{background:var(--ui-hover)}body .history-item.active{background:var(--ui-selected);border-color:var(--ui-border);box-shadow:none}body .history-open>svg,body .history-item.active .history-open>svg,body .history-actions button,body .history-actions button.pinned{color:var(--ui-muted)}body .history-actions button:hover,body .history-actions button.pinned{color:var(--ui-accent)}
+body .drop-zone{background:var(--ui-soft);border-color:var(--ui-border);border-radius:var(--ui-radius)}body .drop-zone:hover{background:var(--ui-hover);border-color:var(--ui-accent)}body .drop-icon{background:var(--ui-surface);color:var(--ui-muted);border-color:var(--ui-border);border-radius:var(--ui-radius)}body .drop-zone strong,body .drop-zone small{color:var(--ui-muted)}body .help-button:hover{color:var(--ui-accent)}
+body .viewer{border-color:var(--ui-border);border-radius:var(--ui-frame);box-shadow:var(--ui-shadow)}
+body .viewer .toolbar,body .viewer .viewer-footer{background:var(--ui-soft);border-color:var(--ui-border);font-family:var(--ui-font);color:var(--ui-muted)}body .viewer .tree-controls button{color:var(--ui-muted);border-radius:var(--ui-radius)}body .viewer .tree-controls button:hover{color:var(--ui-text);background:var(--ui-hover)}body .viewer .toolbar-divider{background:var(--ui-border)}
+body .viewer .searchbox{background:var(--ui-surface);border-color:var(--ui-border);color:var(--ui-muted);border-radius:var(--ui-radius)}body .viewer .searchbox:focus-within{border-color:var(--ui-accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--ui-accent) 12%,transparent)}body .viewer .searchbox input{color:var(--ui-text)}body .viewer .searchbox input::placeholder,body .viewer .searchbox button,body .viewer kbd,body .viewer .file-meta,body .viewer .file-meta .dot,body .viewer .selected-path,body .viewer .selected-path button{color:var(--ui-muted)}
+body .viewer .toolbar-tool{color:var(--ui-muted);border-color:var(--ui-border);background:var(--ui-surface);border-radius:var(--ui-radius)}body .viewer .toolbar-tool:hover,body .viewer .toolbar-tool[aria-expanded=true]{color:var(--ui-accent);border-color:var(--ui-accent);background:var(--ui-hover)}body .viewer .sync-indicator{color:var(--ui-muted)}body .viewer .sync-indicator i{background:var(--ui-accent)}body .viewer .sync-indicator.warning{color:var(--ui-warning)}body .viewer .sync-indicator.warning i{background:var(--ui-warning)}body .viewer .sync-indicator.error{color:var(--ui-error)}body .viewer .sync-indicator.error i{background:var(--ui-error)}
+body dialog,body .appearance-popover{background:var(--ui-surface);border-color:var(--ui-border);border-radius:var(--ui-frame);color:var(--ui-text);font-family:var(--ui-font);color-scheme:inherit;box-shadow:var(--ui-shadow)}body dialog p,body .appearance-heading,body .appearance-note,body .conflict-columns label,body .theme-color-field label,body .shortcut-row,body #value-dialog #value-path,body #value-dialog .value-dialog-footer{color:var(--ui-muted)}body .shortcut-row,body .help-note{border-color:var(--ui-border)}body dialog kbd{color:var(--ui-muted)}
+body .appearance-popover select,body .theme-hex,body .theme-color-field input[type=color]{background:var(--ui-soft);color:var(--ui-text);border-color:var(--ui-border);border-radius:var(--ui-radius)}body .appearance-heading button,body .font-size-value,body .appearance-reset{color:var(--ui-accent)}body .appearance-reset{border-color:var(--ui-border)}body .font-size-controls button{background:var(--ui-surface);color:var(--ui-muted);border-color:var(--ui-border);border-radius:var(--ui-radius)}body .font-size-controls button:hover{color:var(--ui-accent);border-color:var(--ui-accent)}body .font-size-controls input[type=range]{accent-color:var(--ui-accent)}
+body .conflict-actions button,body .theme-dialog-footer button{background:var(--ui-soft);color:var(--ui-text);border-color:var(--ui-border);border-radius:var(--ui-radius)}body .conflict-actions button:last-child,body .theme-dialog-footer button:last-child,body .value-dialog-footer button{background:var(--ui-accent);color:var(--ui-onaccent);border-color:var(--ui-accent);border-radius:var(--ui-radius)}body .toast{background:var(--ui-accent);color:var(--ui-onaccent);border-color:var(--ui-border);border-radius:var(--ui-radius)}body .notice{border-radius:var(--ui-radius)}
+/* Native controls follow their own surface, keeping both preference domains independent. */
+.viewer .tree-viewport,#value-dialog #full-value,#editor-dialog #json-editor,.theme-preview{color-scheme:var(--json-color-scheme,light)}
+body #editor-dialog>p,body #value-dialog .edit-status{color:var(--ui-muted)}body #editor-dialog .edit-status.edit-error,body #value-dialog .edit-status.edit-error{color:var(--ui-error)}
+body .history-scroll{scrollbar-color:var(--ui-border) transparent}body .font-size-value input:focus-visible,body .theme-hex:focus{outline-color:var(--ui-accent);border-color:var(--ui-accent)}
+body button:focus-visible,body a:focus-visible,body .appearance-popover select:focus-visible,body .appearance-popover button:focus-visible{outline-color:var(--ui-accent)}
+.sidebar-actions{display:flex;align-items:center;gap:12px}.settings-button{font-size:10px;color:var(--ui-muted);padding:6px 0}.settings-button svg{width:14px;height:14px}.settings-button:hover{color:var(--ui-accent)}
+#settings-dialog{width:calc(100% - 32px);max-width:760px;max-height:calc(100dvh - 40px);overflow:auto;padding:26px}#settings-dialog .settings-intro{margin:12px 0 20px;font-size:12px}#settings-dialog h3{font-size:12px;letter-spacing:.5px;margin:0 0 12px;font-weight:500}.style-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.style-option{display:flex;flex-direction:column;align-items:stretch;gap:0;text-align:left;min-width:0;padding:9px;background:var(--ui-soft);border:1px solid var(--ui-border);border-radius:var(--ui-radius);font-family:var(--ui-font)}.style-option:hover{border-color:var(--ui-accent);background:var(--ui-hover)}.style-option[aria-pressed=true]{border-color:var(--ui-accent);box-shadow:0 0 0 1px var(--ui-accent)}.style-option-title{font-size:11px;color:var(--ui-text);font-weight:500;display:flex;align-items:center;justify-content:space-between;gap:5px;margin:10px 1px 4px}.style-option-check{color:var(--ui-accent);visibility:hidden}.style-option[aria-pressed=true] .style-option-check{visibility:visible}.style-option-description{font-size:10px;line-height:1.65;color:var(--ui-muted);margin:0 1px 3px;min-height:33px}.style-preview{display:flex;height:76px;overflow:hidden;border:1px solid var(--sample-border);border-radius:var(--sample-radius);background:var(--sample-surface);pointer-events:none}.style-preview-aside{width:30%;padding:10px 6px;background:var(--sample-sidebar);border-right:1px solid var(--sample-border)}.style-preview-aside::before{content:"";display:block;height:7px;background:var(--sample-accent);border-radius:var(--sample-radius);margin-bottom:8px}.style-preview-aside::after{content:"";display:block;height:22px;border-top:2px solid var(--sample-border);border-bottom:2px solid var(--sample-border);opacity:.5}.style-preview-main{flex:1;min-width:0}.style-preview-bar{height:15px;border-bottom:1px solid var(--sample-border);background:var(--sample-sidebar)}.style-preview-lines{margin:10px 9px;height:36px;background:repeating-linear-gradient(to bottom,var(--sample-border) 0 2px,transparent 2px 9px);opacity:.5;width:65%}.settings-footer{border-top:1px solid var(--ui-border);padding-top:16px;margin-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.settings-footer small{font-size:10px;color:var(--ui-muted)}.settings-footer button{font-size:11px;padding:7px 17px;border-radius:var(--ui-radius);background:var(--ui-accent);color:var(--ui-onaccent)}
+body[data-ui-style=macintosh] .toolbar,body[data-ui-style=macintosh] .dialog-heading{background:repeating-linear-gradient(to bottom,#fff 0 2px,#b8b8b8 2px 3px);border-bottom:1px solid #222}body[data-ui-style=macintosh] .dialog-heading h2{background:#fff;padding:2px 8px;font-size:18px}body[data-ui-style=macintosh] .open-button{box-shadow:2px 2px 0 #777}body[data-ui-style=macintosh] .toolbar-tool,body[data-ui-style=macintosh] .tree-controls button{border:1px solid #222;background:#fff}body[data-ui-style=macintosh] .brand img{filter:grayscale(1) contrast(2)}
+body[data-ui-style=windows95] .open-button,body[data-ui-style=windows95] .toolbar-tool,body[data-ui-style=windows95] .tree-controls button,body[data-ui-style=windows95] .font-size-controls button,body[data-ui-style=windows95] .settings-footer button{box-shadow:inset 1px 1px #fff,inset -1px -1px #404040;border:1px solid #808080}body[data-ui-style=windows95] .viewer,body[data-ui-style=windows95] dialog{border:2px solid;border-color:#fff #404040 #404040 #fff}body[data-ui-style=windows95] .dialog-heading{background:#000080;color:#fff;margin:-20px -20px 16px;padding:5px 8px}body[data-ui-style=windows95] .dialog-heading h2{font-size:15px}body[data-ui-style=windows95] .searchbox{box-shadow:inset 1px 1px #404040,inset -1px -1px #fff}
+body[data-ui-style=newspaper] .brand{font-family:Georgia,"Songti SC",serif;font-weight:700}body[data-ui-style=newspaper] .brand small{letter-spacing:3px}body[data-ui-style=newspaper] .toolbar{border-top:3px double var(--ui-border);border-bottom:3px double var(--ui-border)}body[data-ui-style=newspaper] .history-section-heading{font-weight:bold;letter-spacing:2px;border-bottom:1px solid var(--ui-border);padding-bottom:6px}body[data-ui-style=newspaper] .brand img{filter:sepia(1) saturate(.4)}
+body[data-ui-style=archive] .history-section-heading{letter-spacing:2px;text-transform:uppercase}body[data-ui-style=archive] .history-item.active{border-left:4px solid var(--ui-accent)}body[data-ui-style=archive] .brand{font-family:Georgia,"Songti SC",serif}body[data-ui-style=archive] .open-button{box-shadow:2px 3px 0 #a4aa8f}body[data-ui-style=archive] .drop-zone{border-style:dashed;border-width:2px}
+body[data-ui-style=computer80] .brand,body[data-ui-style=computer80] .dialog-heading h2{text-shadow:0 0 8px #a4e69c55}body[data-ui-style=computer80] .sidebar{background-image:repeating-linear-gradient(to bottom,transparent 0 3px,#a4e69c04 3px 4px)}body[data-ui-style=computer80] .open-button{letter-spacing:1px}body[data-ui-style=computer80] .brand img{filter:grayscale(1) sepia(1) hue-rotate(65deg) saturate(2)}
+body[data-ui-style=developer] .toolbar{border-top:0}body[data-ui-style=developer] .history-item.active{border-left:2px solid #087bc2}body[data-ui-style=developer] .tree-controls button{font-size:10px;padding-top:5px;padding-bottom:5px}body[data-ui-style=developer] .brand{font-size:19px;letter-spacing:0}
+body[data-ui-style=linear] .open-button{box-shadow:0 2px 4px #6356cc20}body[data-ui-style=linear] .brand{font-size:20px;letter-spacing:-.7px}body[data-ui-style=linear] .history-item.active{box-shadow:0 1px 4px #272d4a0a}body[data-ui-style=linear] dialog,body[data-ui-style=linear] .appearance-popover{box-shadow:0 16px 60px #272d4a20}
+body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=notion] .viewer{border-top:0;border-bottom:0}body[data-ui-style=notion] .toolbar{border-top:0;background:#fff}body[data-ui-style=notion] .history-item{border-color:transparent}body[data-ui-style=notion] .drop-zone{border-style:solid;background:transparent}
+@media(max-width:650px){.style-options{grid-template-columns:repeat(2,minmax(0,1fr))}#settings-dialog{padding:20px}.sidebar-actions{gap:8px}}@media(max-width:380px){.style-options{grid-template-columns:1fr}}@media(prefers-reduced-motion:no-preference){.style-option{transition:border-color .12s,background-color .12s}}
 </style>
 </head>
 <body>
@@ -47,7 +96,7 @@
     <div class="history-scroll" id="history-list"></div>
     <div class="sidebar-bottom">
       <button class="drop-zone" id="drop-zone"><span class="drop-icon" data-icon="upload"></span><span><strong>拖入 JSON 文件</strong><small>或点击选择 · 最大 20 MB</small></span></button>
-      <div class="sidebar-help"><button class="help-button" id="help-button" title="使用帮助" aria-label="使用帮助"><span data-icon="help"></span>使用帮助</button><span class="sidebar-readonly"><span data-icon="lock"></span><span id="edit-mode">只读</span></span></div>
+      <div class="sidebar-help"><div class="sidebar-actions"><button class="settings-button" id="settings-button" title="网页风格设置" aria-haspopup="dialog"><span data-icon="settings"></span>设置</button><button class="help-button" id="help-button" title="使用帮助" aria-label="使用帮助"><span data-icon="help"></span>使用帮助</button></div><span class="sidebar-readonly"><span data-icon="lock"></span><span id="edit-mode">只读</span></span></div>
     </div>
   </aside>
 
@@ -73,7 +122,8 @@
   <span class="node-key">"enabled"</span>: <span class="node-boolean">true</span>,
   <span class="node-key">"empty"</span>: <span class="node-null">null</span>
 <span class="node-bracket">}</span></div><div class="theme-dialog-footer"><button id="reset-theme">恢复当前主题默认配色</button><button id="finish-theme">完成</button></div></dialog>
-  <dialog id="help-dialog"><div class="dialog-heading"><h2>让数据更好读</h2><button id="close-help" aria-label="关闭帮助"><span data-icon="close"></span></button></div><p>点击「打开 JSON 文件」或将文件拖入网页。历史记录保存在当前浏览器中，图钉可将常用文件置顶。</p><p>文件选择窗口会优先从上次打开的位置开始；重新打开网页后，也会参考历史文件的位置。普通文件选择模式下，起始位置由 Edge 自行管理。</p><p>右上方「配色」可以切换主题或自定义颜色；「Aa」可弹出字号面板，用滑块、加减按钮或输入数字调整大小。「缩进」可调整树形层级间距。配色、字号和缩进即时生效并自动记住。</p><p>获得写入授权后，双击节点或点击「编辑字段」可修改值；「编辑 JSON」可修改完整文件，支持字段增删和改名。字符串直接输入文字，其他类型输入有效 JSON。停止输入约 450 ms 后自动写回原文件，格式错误时保留草稿并暂停写入。搜索会自动展开匹配内容所在的路径。</p><p>「一级展开」显示根节点的直接字段；二级到四级逐层深入。搜索期间点击展开级别会清空搜索并切换层级。</p><p>双击 HTML 可独立使用；终端执行 jsonview 文件.json 会自动启动或复用本地服务，直接打开原文件。服务方式需要 Node.js 18+；关闭浏览器后服务继续运行，执行 jsonview --stop 停止服务。页面隐藏时停止文件检查。</p><p>授权读取原文件后，页面可见时约每秒检查一次外部修改。切回页面时也会立即检查。格式错误时保留上次有效的树形视图。</p><p>重新打开浏览器后，历史文件可能需要再次授权。如果当前浏览器限制本地页面的文件读取权限，会改用文件快照并明确提示无法自动同步；可重新选择文件更新内容。</p><div class="shortcut-row"><span>打开文件</span><kbd>⌘ / Ctrl + O</kbd></div><div class="shortcut-row"><span>搜索</span><kbd>⌘ / Ctrl + K</kbd></div><div class="shortcut-row"><span>选择节点后展开 / 收起</span><kbd>← / →</kbd></div><p class="help-note">修改直接写回已授权的原文件，不上传。写入前核对外部修改；存在冲突时暂停保存。关闭页面前请确认状态为「已保存到原文件」。</p></dialog>
+  <dialog id="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title">设置</h2><button id="close-settings" aria-label="关闭设置"><span data-icon="close"></span></button></div><p class="settings-intro">网页风格只调整界面外观，与 JSON 内容配色、字号和缩进独立。</p><h3>网页风格</h3><div id="ui-style-options" class="style-options" role="group" aria-label="选择网页风格"></div><div class="settings-footer"><small>即时预览，自动记住上次选择。</small><button id="finish-settings">完成</button></div></dialog>
+  <dialog id="help-dialog"><div class="dialog-heading"><h2>让数据更好读</h2><button id="close-help" aria-label="关闭帮助"><span data-icon="close"></span></button></div><p>左下角「设置」可选择网页风格；右上角「配色」只调整 JSON 内容颜色，两者互不影响。</p><p>点击「打开 JSON 文件」或将文件拖入网页。历史记录保存在当前浏览器中，图钉可将常用文件置顶。</p><p>文件选择窗口会优先从上次打开的位置开始；重新打开网页后，也会参考历史文件的位置。普通文件选择模式下，起始位置由 Edge 自行管理。</p><p>右上方「配色」可以切换主题或自定义颜色；「Aa」可弹出字号面板，用滑块、加减按钮或输入数字调整大小。「缩进」可调整树形层级间距。配色、字号和缩进即时生效并自动记住。</p><p>获得写入授权后，双击节点或点击「编辑字段」可修改值；「编辑 JSON」可修改完整文件，支持字段增删和改名。字符串直接输入文字，其他类型输入有效 JSON。停止输入约 450 ms 后自动写回原文件，格式错误时保留草稿并暂停写入。搜索会自动展开匹配内容所在的路径。</p><p>「一级展开」显示根节点的直接字段；二级到四级逐层深入。搜索期间点击展开级别会清空搜索并切换层级。</p><p>双击 HTML 可独立使用；终端执行 jsonview 文件.json 会自动启动或复用本地服务，直接打开原文件。服务方式需要 Node.js 18+；关闭浏览器后服务继续运行，执行 jsonview --stop 停止服务。页面隐藏时停止文件检查。</p><p>授权读取原文件后，页面可见时约每秒检查一次外部修改。切回页面时也会立即检查。格式错误时保留上次有效的树形视图。</p><p>重新打开浏览器后，历史文件可能需要再次授权。如果当前浏览器限制本地页面的文件读取权限，会改用文件快照并明确提示无法自动同步；可重新选择文件更新内容。</p><div class="shortcut-row"><span>打开文件</span><kbd>⌘ / Ctrl + O</kbd></div><div class="shortcut-row"><span>搜索</span><kbd>⌘ / Ctrl + K</kbd></div><div class="shortcut-row"><span>选择节点后展开 / 收起</span><kbd>← / →</kbd></div><p class="help-note">修改直接写回已授权的原文件，不上传。写入前核对外部修改；存在冲突时暂停保存。关闭页面前请确认状态为「已保存到原文件」。</p></dialog>
   <input type="file" id="file-input" accept=".json,.jsonc,application/json" hidden>
   <script>(async function () {
 'use strict';
@@ -319,6 +369,7 @@ class LocalFileHandle {
 const $ = id => document.getElementById(id);
 const icons = {
   indent: '<path d="M4 5h16M11 10h9M11 15h9M4 20h16M3 10l4 2.5L3 15"/>',
+  settings: '<path d="m10 3-.6 2.2-2 .9L5.3 5.5 3.8 8l1.5 1.6-.2 2.3L3.5 13l1 2.8 2.4.1 1.6 1.6.1 2.4 2.8 1 1.1-1.6 2.3-.2 1.6 1.5 2.5-1.5-.6-2.1.9-2 2.2-.6v-3l-2.2-.6-.9-2 .6-2.1-2.5-1.5-1.6 1.5-2.3-.2L13 3z"/><circle cx="12" cy="12" r="3"/>',
   palette: '<circle cx="12" cy="12" r="9"/><circle cx="8" cy="9" r=".6"/><circle cx="13" cy="7" r=".6"/><circle cx="17" cy="11" r=".6"/><path d="M8 17c1-3 5-4 7-1"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>',
@@ -351,6 +402,65 @@ document.querySelectorAll('[data-icon]').forEach(el => el.replaceChildren(icon(e
 if (!/Mac|iPhone|iPad/.test(navigator.platform)) {
   $('open-file').querySelector('kbd').textContent = 'Ctrl O';
   $('search-hint').textContent = 'Ctrl K';
+}
+
+// Page chrome and JSON content are deliberately independent preference domains.
+const UI_STYLE_STORAGE_KEY = 'json-grove-ui-style-v1';
+const UI_STYLES = {
+  "default": {"name": "默认（当前风格）", "description": "米白与灰绿，温和、清爽。"},
+  "macintosh": {"name": "经典 Macintosh", "description": "黑白线条、条纹标题与像素时代的窗口。"},
+  "windows95": {"name": "Windows 95 / 98", "description": "经典灰色、立体按钮与海军蓝强调色。"},
+  "newspaper": {"name": "复古报刊", "description": "暖纸色、衬线标题与印刷分隔线。"},
+  "archive": {"name": "老式档案馆", "description": "奶油纸、墨绿封面与档案标签。"},
+  "computer80": {"name": "80 年代电脑", "description": "深色机壳、荧光绿色与等宽控件。"},
+  "developer": {"name": "开发者工具", "description": "深灰面板、蓝色焦点与紧凑控件。"},
+  "linear": {"name": "Linear 风格", "description": "冷灰留白、紫色点缀与轻盈浮层。"},
+  "notion": {"name": "Notion 文档风", "description": "黑白文字、浅灰侧栏与克制的边框。"}
+};
+let uiStyle = 'default';
+function applyUiStyle(value, persist = true) {
+  uiStyle = Object.hasOwn(UI_STYLES, value) ? value : 'default';
+  document.body.dataset.uiStyle = uiStyle;
+  for (const button of $('ui-style-options').querySelectorAll('[data-style-choice]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.styleChoice === uiStyle));
+  }
+  if (persist) {
+    try { localStorage.setItem(UI_STYLE_STORAGE_KEY, uiStyle); }
+    catch { toast('网页风格已应用，但浏览器未允许保存设置。'); }
+  }
+}
+function renderUiStyles() {
+  const fragment = document.createDocumentFragment();
+  for (const [id, style] of Object.entries(UI_STYLES)) {
+    const button = document.createElement('button');
+    button.type = 'button'; button.className = 'style-option'; button.dataset.styleChoice = id;
+    button.setAttribute('aria-pressed', String(id === uiStyle));
+    const preview = document.createElement('span'); preview.className = 'style-preview'; preview.setAttribute('aria-hidden', 'true');
+    const aside = document.createElement('span'); aside.className = 'style-preview-aside';
+    const main = document.createElement('span'); main.className = 'style-preview-main';
+    const bar = document.createElement('span'); bar.className = 'style-preview-bar'; bar.style.display = 'block';
+    const lines = document.createElement('span'); lines.className = 'style-preview-lines'; lines.style.display = 'block';
+    main.append(bar, lines); preview.append(aside, main);
+    const title = document.createElement('span'); title.className = 'style-option-title'; title.append(document.createTextNode(style.name));
+    const check = document.createElement('span'); check.className = 'style-option-check'; check.textContent = '✓'; check.setAttribute('aria-hidden', 'true'); title.append(check);
+    const description = document.createElement('span'); description.className = 'style-option-description'; description.textContent = style.description;
+    button.append(preview, title, description);
+    button.onclick = () => applyUiStyle(id);
+    fragment.append(button);
+  }
+  $('ui-style-options').replaceChildren(fragment);
+}
+function initUiStyles() {
+  let saved = 'default';
+  try { saved = localStorage.getItem(UI_STYLE_STORAGE_KEY) || 'default'; } catch { /* Keep the current design when storage is unavailable. */ }
+  renderUiStyles(); applyUiStyle(saved, false);
+  $('settings-button').onclick = () => { closeAppearancePopovers(); $('settings-dialog').showModal(); };
+  $('close-settings').onclick = $('finish-settings').onclick = () => $('settings-dialog').close();
+  window.addEventListener('storage', event => {
+    if (event.key === UI_STYLE_STORAGE_KEY || event.key === null) {
+      try { applyUiStyle(localStorage.getItem(UI_STYLE_STORAGE_KEY) || 'default', false); } catch {}
+    }
+  });
 }
 
 // Theme preferences are separate from the history database; no JSON file is changed.
@@ -391,7 +501,7 @@ function applyTheme() {
   for (const target of [document.querySelector('.viewer'), $('value-dialog'), $('editor-dialog'), $('theme-preview'), $('theme-popover'), $('font-popover'), $('indent-popover')]) {
     for (const [key, value] of Object.entries(colors)) target.style.setProperty(`--json-${key}`, value);
     target.style.setProperty('--json-error', dark ? '#ff9c95' : '#b44033');
-    target.style.colorScheme = dark ? 'dark' : 'light';
+    target.style.setProperty('--json-color-scheme', dark ? 'dark' : 'light');
   }
   for (const option of $('theme-select').options) option.textContent = JSON_THEMES[option.value].name + (themeState.custom[option.value] && Object.keys(themeState.custom[option.value]).length ? ' · 自定义' : '');
   $('theme-select').value = themeState.selected;
@@ -1615,6 +1725,7 @@ window.addEventListener('focus', () => { void resumePoll(); });
 window.addEventListener('pagehide', () => { clearTimeout(pollTimer); });
 window.addEventListener('pageshow', () => { void resumePoll(); });
 initTheme();
+initUiStyles();
 clearViewer();
 await initStorage();
 window.addEventListener('hashchange', () => { void receiveTerminalRequest(); });
