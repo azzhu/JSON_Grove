@@ -122,7 +122,7 @@ body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=not
   <span class="node-key">"enabled"</span>: <span class="node-boolean">true</span>,
   <span class="node-key">"empty"</span>: <span class="node-null">null</span>
 <span class="node-bracket">}</span></div><div class="theme-dialog-footer"><button id="reset-theme">恢复当前主题默认配色</button><button id="finish-theme">完成</button></div></dialog>
-  <dialog id="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title">设置</h2><button id="close-settings" aria-label="关闭设置"><span data-icon="close"></span></button></div><p class="settings-intro">网页风格只调整界面外观，与 JSON 内容配色、字号和缩进独立。</p><h3>网页风格</h3><div id="ui-style-options" class="style-options" role="group" aria-label="选择网页风格"></div><div class="settings-footer"><small>即时预览，自动记住上次选择。</small><button id="finish-settings">完成</button></div></dialog>
+  <dialog id="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title">设置</h2><button id="close-settings" aria-label="关闭设置"><span data-icon="close"></span></button></div><p class="settings-intro">网页风格只调整界面外观，与 JSON 内容配色、字号和缩进独立。</p><h3>网页风格</h3><div id="ui-style-options" class="style-options" role="group" aria-label="选择网页风格"></div><div class="settings-footer"><small>选择后自动保存并关闭设置。</small><button id="finish-settings">完成</button></div></dialog>
   <dialog id="help-dialog"><div class="dialog-heading"><h2>让数据更好读</h2><button id="close-help" aria-label="关闭帮助"><span data-icon="close"></span></button></div><p>左下角「设置」可选择网页风格；右上角「配色」只调整 JSON 内容颜色，两者互不影响。</p><p>点击「打开 JSON 文件」或将文件拖入网页。历史记录保存在当前浏览器中，图钉可将常用文件置顶。</p><p>文件选择窗口会优先从上次打开的位置开始；重新打开网页后，也会参考历史文件的位置。普通文件选择模式下，起始位置由 Edge 自行管理。</p><p>右上方「配色」可以切换主题或自定义颜色；「Aa」可弹出字号面板，用滑块、加减按钮或输入数字调整大小。「缩进」可调整树形层级间距。配色、字号和缩进即时生效并自动记住。</p><p>获得写入授权后，双击节点或点击「编辑字段」可修改值；「编辑 JSON」可修改完整文件，支持字段增删和改名。字符串直接输入文字，其他类型输入有效 JSON。停止输入约 450 ms 后自动写回原文件，格式错误时保留草稿并暂停写入。搜索会自动展开匹配内容所在的路径。</p><p>「一级展开」显示根节点的直接字段；二级到四级逐层深入。搜索期间点击展开级别会清空搜索并切换层级。</p><p>双击 HTML 可独立使用；终端执行 jsonview 文件.json 会自动启动或复用本地服务，直接打开原文件。服务方式需要 Node.js 18+；关闭浏览器后服务继续运行，执行 jsonview --stop 停止服务。页面隐藏时停止文件检查。</p><p>授权读取原文件后，页面可见时约每秒检查一次外部修改。切回页面时也会立即检查。格式错误时保留上次有效的树形视图。</p><p>重新打开浏览器后，历史文件可能需要再次授权。如果当前浏览器限制本地页面的文件读取权限，会改用文件快照并明确提示无法自动同步；可重新选择文件更新内容。</p><div class="shortcut-row"><span>打开文件</span><kbd>⌘ / Ctrl + O</kbd></div><div class="shortcut-row"><span>搜索</span><kbd>⌘ / Ctrl + K</kbd></div><div class="shortcut-row"><span>选择节点后展开 / 收起</span><kbd>← / →</kbd></div><p class="help-note">修改直接写回已授权的原文件，不上传。写入前核对外部修改；存在冲突时暂停保存。关闭页面前请确认状态为「已保存到原文件」。</p></dialog>
   <input type="file" id="file-input" accept=".json,.jsonc,application/json" hidden>
   <script>(async function () {
@@ -445,7 +445,7 @@ function renderUiStyles() {
     const check = document.createElement('span'); check.className = 'style-option-check'; check.textContent = '✓'; check.setAttribute('aria-hidden', 'true'); title.append(check);
     const description = document.createElement('span'); description.className = 'style-option-description'; description.textContent = style.description;
     button.append(preview, title, description);
-    button.onclick = () => applyUiStyle(id);
+    button.onclick = () => { applyUiStyle(id); $('settings-dialog').close(); };
     fragment.append(button);
   }
   $('ui-style-options').replaceChildren(fragment);
