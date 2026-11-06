@@ -640,7 +640,7 @@ async function rememberEditState() {
   Object.assign(record, { raw: session.diskRaw, size: active.size, lastModified: active.lastModified });
   if (session.dirty || session.editorDraft) record.pendingEdit = { baseRaw: session.diskRaw, raw: active.raw, editorDraft: session.editorDraft };
   else delete record.pendingEdit;
-  await storeRecord(record);
+  await storeRecord(record, { fields: ['raw', 'size', 'lastModified'], draft: record.pendingEdit ?? null, draftOwner: session.draftOwner });
 }
 function createEditSession(file, diskRaw, writeAllowed) {
   clearTimeout(inputTimer); clearTimeout(editSession?.saveTimer); editor = null;
@@ -816,6 +816,7 @@ function restorePendingEdit(record) {
   const pending = record.pendingEdit;
   if (!pending || !editSession || typeof pending.raw !== 'string') return;
   const session = editSession;
+  session.draftOwner = record._pendingOwner;
   try {
     const parsed = parseDocument(pending.raw); parsed.indexed = buildIndex(parsed.data, parsed);
     session.dirty = pending.raw !== session.diskRaw;
@@ -833,39 +834,193 @@ function restorePendingEdit(record) {
   } catch { notice('历史草稿无法解析，原文件未被改动。', null, true); }
 }
 
+// A separate tombstone store survives stale whole-record writes. Version 2 also
+// closes older viewer connections before they can write using the previous schema.
+const HISTORY_VERSION = 2, HISTORY_SIGNAL = 'json-grove-history-signal-v2';
+const historyPageId = crypto.randomUUID();
+let historyRevision = 0, historyChannel = null, historyTimer;
+let historySyncPromise = null, historySyncAgain = false, historyWriteQueue = Promise.resolve();
+let historyClosed = false;
+const persistedHistoryIds = new Set(), removedHistoryIds = new Set();
+const historyPendingIds = new Map();
+function storedHandle(handle) { return handle?.toStoredHandle ? handle.toStoredHandle() : handle; }
+function reviveHistoryRecord(saved) {
+  const record = { ...saved, handle: saved.handle?.type === 'jsonview-local-file' ? new LocalFileHandle(saved.handle) : saved.handle };
+  const drafts = Object.entries(record.pendingEdits || {}).filter(([, entry]) => entry?.draft);
+  const chosen = drafts.find(([owner]) => owner === historyPageId) || drafts.sort((a, b) => b[1].updatedAt - a[1].updatedAt)[0];
+  if (chosen) { record.pendingEdit = chosen[1].draft; record._pendingOwner = chosen[0]; }
+  else if (record.pendingEdit) record._pendingOwner = 'legacy';
+  else { delete record.pendingEdit; delete record._pendingOwner; }
+  return record;
+}
+function historyTransaction(stores, mode, run) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(stores, mode);
+    let result;
+    tx.oncomplete = () => resolve(result);
+    tx.onerror = tx.onabort = () => reject(tx.error || new Error('历史事务已中止'));
+    try { run(tx, value => { result = value; }); }
+    catch (error) { try { tx.abort(); } catch {} reject(error); }
+  });
+}
+function signalHistoryChange() {
+  try { historyChannel?.postMessage({ page: historyPageId }); } catch { /* Polling remains available. */ }
+  try { localStorage.setItem(HISTORY_SIGNAL, `${Date.now()}:${historyPageId}:${crypto.randomUUID()}`); } catch { /* IndexedDB polling is the fallback for file: pages. */ }
+}
+function markHistoryRemoved(id) {
+  removedHistoryIds.add(id); viewStates.delete(id);
+  if (active?.id !== id) return;
+  if (editingPending()) {
+    active.forgotten = true;
+    notice('该历史记录已在另一页面移除。当前未保存编辑仍保留，之后保存不会恢复该历史记录。');
+  } else clearViewer();
+}
+async function syncHistory(force = false) {
+  if (!db || !storageAvailable || historyClosed) return;
+  if (historySyncPromise) { historySyncAgain = true; await historySyncPromise; return; }
+  historySyncPromise = (async () => {
+    do {
+      historySyncAgain = false;
+      const snapshot = await historyTransaction(['files', 'historyMeta'], 'readonly', (tx, done) => {
+        const meta = tx.objectStore('historyMeta').get('revision');
+        meta.onsuccess = () => {
+          const revision = meta.result?.value || 0;
+          if (!force && revision === historyRevision) { done(null); return; }
+          const request = tx.objectStore('files').getAll();
+          request.onsuccess = () => done({ revision, rows: request.result });
+        };
+      });
+      if (!snapshot) continue;
+      const nextIds = new Set(snapshot.rows.map(record => record.id));
+      for (const id of persistedHistoryIds) {
+        if (!nextIds.has(id) && !historyPendingIds.has(id)) markHistoryRemoved(id);
+      }
+      // Locally queued new records remain visible until their transaction commits.
+      const pending = records.filter(record => historyPendingIds.has(record.id) && !nextIds.has(record.id) && !removedHistoryIds.has(record.id));
+      records = snapshot.rows.filter(record => !removedHistoryIds.has(record.id)).map(reviveHistoryRecord).concat(pending);
+      persistedHistoryIds.clear(); nextIds.forEach(id => persistedHistoryIds.add(id));
+      historyRevision = snapshot.revision;
+      renderHistory();
+      const current = active && records.find(record => record.id === active.id);
+      if (current && !editingPending() && current.raw !== active.raw) {
+        if (active.handle && active.syncEnabled) void pollFile(true);
+        else {
+          try {
+            const parsed = parseDocument(current.raw);
+            editSession.diskRaw = current.raw;
+            if (editSession.writer) editSession.writer.diskRaw = current.raw;
+            activate({ ...active, raw: current.raw, size: current.size, lastModified: current.lastModified }, parsed, true);
+            refreshOpenEditor();
+          } catch { /* Preserve the last valid tree. */ }
+        }
+      }
+      force = false;
+    } while (historySyncAgain);
+  })();
+  try { await historySyncPromise; }
+  catch { /* A later focus or signal retries; never replace local data on a failed read. */ }
+  finally { historySyncPromise = null; }
+}
+function scheduleHistorySync() {
+  clearTimeout(historyTimer);
+  if (document.hidden || historyClosed || !db || !storageAvailable) return;
+  historyTimer = setTimeout(async () => {
+    await syncHistory(); scheduleHistorySync();
+  }, 1500);
+}
+function initHistorySync() {
+  try {
+    if (typeof BroadcastChannel === 'function') {
+      historyChannel = new BroadcastChannel(HISTORY_SIGNAL);
+      historyChannel.onmessage = () => { void syncHistory(); };
+    }
+  } catch { /* Some browsers isolate file: channels; periodic metadata reads still work. */ }
+  window.addEventListener('storage', event => {
+    if (event.key === HISTORY_SIGNAL || event.key === null) void syncHistory();
+    if (event.key === THEME_STORAGE_KEY || event.key === null) {
+      try { themeState = normalizeThemeState(JSON.parse(localStorage.getItem(THEME_STORAGE_KEY))); applyTheme(); } catch {}
+    }
+    if (event.key === FONT_SIZE_STORAGE_KEY || event.key === null) {
+      try { if (!applyFontSize(localStorage.getItem(FONT_SIZE_STORAGE_KEY), false)) applyFontSize(DEFAULT_FONT_SIZE, false); } catch {}
+    }
+    if (event.key === INDENT_STORAGE_KEY || event.key === null) {
+      try { if (!applyIndent(localStorage.getItem(INDENT_STORAGE_KEY), false)) applyIndent(DEFAULT_INDENT, false); } catch {}
+    }
+  });
+  window.addEventListener('focus', () => { void syncHistory(true); scheduleHistorySync(); });
+  window.addEventListener('pageshow', () => { historyClosed = false; void syncHistory(true); scheduleHistorySync(); });
+  window.addEventListener('pagehide', () => { historyClosed = true; clearTimeout(historyTimer); });
+  document.addEventListener('visibilitychange', () => {
+    clearTimeout(historyTimer);
+    if (!document.hidden) { void syncHistory(true); scheduleHistorySync(); }
+  });
+  scheduleHistorySync();
+}
 async function initStorage() {
   try {
     db = await new Promise((resolve, reject) => {
-      const request = indexedDB.open('json-grove', 1);
-      request.onupgradeneeded = () => request.result.createObjectStore('files', { keyPath: 'id' });
+      const request = indexedDB.open('json-grove', HISTORY_VERSION);
+      request.onupgradeneeded = () => {
+        for (const name of ['files', 'historyDeleted', 'historyMeta']) {
+          if (!request.result.objectStoreNames.contains(name)) request.result.createObjectStore(name, { keyPath: 'id' });
+        }
+      };
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
-      request.onblocked = () => reject(new Error('历史数据库被其他页面占用'));
+      request.onblocked = () => reject(new Error('旧页面占用了历史数据库，请关闭旧版页面后刷新。'));
     });
-    db.onversionchange = () => db.close();
-    records = await new Promise((resolve, reject) => {
-      const request = db.transaction('files').objectStore('files').getAll();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  } catch {
+    db.onversionchange = () => { db.close(); storageAvailable = false; historyClosed = true; clearTimeout(historyTimer); notice('历史存储已由其他页面更新，请刷新本页后继续保存历史。'); };
+    await syncHistory(true);
+    initHistorySync();
+  } catch (error) {
     storageAvailable = false;
-    toast('浏览器无法保存历史记录；当前仍可正常查看文件。');
+    toast(error?.message || '浏览器无法保存历史记录；当前仍可正常查看文件。');
   }
-  records = records.map(record => ({ ...record, handle: record.handle?.type === 'jsonview-local-file' ? new LocalFileHandle(record.handle) : record.handle }));
   renderHistory();
 }
-async function storeRecord(record) {
-  if (!db || !storageAvailable) return;
-  try {
-    await new Promise((resolve, reject) => {
-      const tx = db.transaction('files', 'readwrite');
-      tx.objectStore('files').put({ ...record, handle: record.handle?.toStoredHandle ? record.handle.toStoredHandle() : record.handle });
-      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error);
+function storeRecord(record, options = {}) {
+  if (!db || !storageAvailable || removedHistoryIds.has(record.id)) return Promise.resolve();
+  // Capture only the fields this operation owns, before awaiting any transaction.
+  // Pinning must not save an old text snapshot, and saving text must not undo a pin.
+  const fields = options.fields || ['name', 'handle', 'raw', 'size', 'lastModified', 'openedAt'];
+  const patch = Object.fromEntries(fields.map(key => [key, key === 'handle' ? storedHandle(record[key]) : record[key]]));
+  const draft = options.draft === undefined ? undefined : structuredClone(options.draft);
+  const id = record.id, initialPinned = !!record.pinned, draftOwner = options.draftOwner;
+  historyPendingIds.set(id, (historyPendingIds.get(id) || 0) + 1);
+  const operation = historyWriteQueue.catch(() => {}).then(async () => {
+    let blocked = false;
+    await historyTransaction(['files', 'historyDeleted', 'historyMeta'], 'readwrite', (tx, done) => {
+      const files = tx.objectStore('files'), deleted = tx.objectStore('historyDeleted');
+      const check = deleted.get(id);
+      check.onsuccess = () => {
+        if (check.result) { blocked = true; done(false); return; }
+        const latest = files.get(id);
+        latest.onsuccess = () => {
+          const merged = { ...(latest.result || { id, pinned: initialPinned }), ...patch, id };
+          if (latest.result?.openedAt && patch.openedAt) merged.openedAt = Math.max(latest.result.openedAt, patch.openedAt);
+          if (draft !== undefined) {
+            merged.pendingEdits = { ...merged.pendingEdits };
+            if (draftOwner === 'legacy') delete merged.pendingEdit;
+            else if (draftOwner) delete merged.pendingEdits[draftOwner];
+            if (draft) merged.pendingEdits[historyPageId] = { updatedAt: Date.now(), draft };
+            else delete merged.pendingEdits[historyPageId];
+          }
+          files.put(merged);
+          const meta = tx.objectStore('historyMeta'), revision = meta.get('revision');
+          revision.onsuccess = () => { meta.put({ id: 'revision', value: (revision.result?.value || 0) + 1 }); done(true); };
+        };
+      };
     });
-  } catch {
-    toast('历史记录保存失败，可能是浏览器存储空间不足。当前文件仍可查看。');
-  }
+    if (blocked) {
+      markHistoryRemoved(id); records = records.filter(row => row.id !== id); renderHistory();
+    } else { persistedHistoryIds.add(id); signalHistoryChange(); }
+  });
+  historyWriteQueue = operation;
+  return operation.catch(() => { toast('历史记录保存失败，当前文件及编辑仍保留。'); }).finally(async () => {
+    const remaining = historyPendingIds.get(id) - 1;
+    if (remaining) historyPendingIds.set(id, remaining); else historyPendingIds.delete(id);
+    await syncHistory(true);
+  });
 }
 async function saveActive() {
   if (editSession) { await rememberEditState(); return; }
@@ -873,7 +1028,7 @@ async function saveActive() {
   const record = records.find(r => r.id === active.id);
   if (!record) return;
   Object.assign(record, { raw: active.raw, size: active.size, lastModified: active.lastModified });
-  await storeRecord(record);
+  await storeRecord(record, { fields: ['raw', 'size', 'lastModified'] });
 }
 async function removeRecord(id) {
   if (active?.id === id && !maySwitchFile()) return;
@@ -881,13 +1036,23 @@ async function removeRecord(id) {
   if (active?.id === id) clearViewer();
   viewStates.delete(id);
   renderHistory();
-  if (db) {
+  removedHistoryIds.add(id);
+  if (db && storageAvailable) {
     try {
-      await new Promise((resolve, reject) => {
-        const tx = db.transaction('files', 'readwrite'); tx.objectStore('files').delete(id);
-        tx.oncomplete = resolve; tx.onerror = () => reject(tx.error);
-      });
-    } catch { toast('无法从浏览器存储中移除该记录。'); }
+      const operation = historyWriteQueue.catch(() => {}).then(() => historyTransaction(['files', 'historyDeleted', 'historyMeta'], 'readwrite', tx => {
+        // Keep deletion separate and durable; no stale record write can clear it.
+        tx.objectStore('historyDeleted').put({ id, deletedAt: Date.now() });
+        tx.objectStore('files').delete(id);
+        const meta = tx.objectStore('historyMeta'), revision = meta.get('revision');
+        revision.onsuccess = () => meta.put({ id: 'revision', value: (revision.result?.value || 0) + 1 });
+      }));
+      historyWriteQueue = operation; await operation;
+      signalHistoryChange(); await syncHistory(true);
+    } catch {
+      removedHistoryIds.delete(id);
+      await syncHistory(true);
+      toast('无法从浏览器存储中移除该记录，列表已恢复，请重试。');
+    }
   }
 }
 function renderHistory() {
@@ -912,7 +1077,7 @@ function renderHistory() {
       text.append(name, date); open.append(icon('file'), text);
       const actions = document.createElement('div'); actions.className = 'history-actions';
       const pin = document.createElement('button'); pin.className = record.pinned ? 'pinned' : ''; pin.title = record.pinned ? '取消置顶' : '置顶文件'; pin.setAttribute('aria-label', `${pin.title}：${record.name}`); pin.setAttribute('aria-pressed', String(!!record.pinned)); pin.append(icon('pin'));
-      pin.onclick = () => { record.pinned = !record.pinned; renderHistory(); void storeRecord(record); };
+      pin.onclick = () => { record.pinned = !record.pinned; renderHistory(); void storeRecord(record, { fields: ['pinned'] }); };
       const remove = document.createElement('button'); remove.title = '移除历史记录'; remove.setAttribute('aria-label', `移除历史记录：${record.name}`); remove.append(icon('close')); remove.onclick = () => { void removeRecord(record.id); };
       actions.append(pin, remove); item.append(open, actions); list.append(item);
     }
@@ -984,6 +1149,7 @@ function syntaxError(error, text) {
 }
 async function loadFile(file, handle = null, knownRecord = null, token = ++generation) {
   if (!maySwitchFile()) return;
+  if (knownRecord && removedHistoryIds.has(knownRecord.id)) return;
   if (file.size > MAX_FILE_SIZE) { toast('文件超过 20 MB，请拆分后查看。'); return; }
   try {
     const raw = await file.text();
@@ -991,7 +1157,7 @@ async function loadFile(file, handle = null, knownRecord = null, token = ++gener
     let parsed;
     try { parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed); }
     catch (error) { notice(`${file.name}：${error instanceof SyntaxError ? syntaxError(error, raw) : error.message} 当前视图保持不变。`, null, true); return; }
-    let existing = knownRecord;
+    let existing = knownRecord && !removedHistoryIds.has(knownRecord.id) ? knownRecord : null;
     if (!existing && handle) {
       for (const record of records) {
         if (!record.handle) continue;
@@ -1003,6 +1169,7 @@ async function loadFile(file, handle = null, knownRecord = null, token = ++gener
     let writeAllowed = false;
     if (handle?.createWritable || handle?.writeIfUnchanged) { try { writeAllowed = await handle.queryPermission({ mode: 'readwrite' }) === 'granted'; } catch {} }
     if (token !== generation) return;
+    if (knownRecord && removedHistoryIds.has(knownRecord.id)) return;
     const record = existing ?? { id: crypto.randomUUID(), name: file.name, pinned: false };
     Object.assign(record, { name: file.name, handle, raw, size: file.size, lastModified: file.lastModified, openedAt: Date.now() });
     if (!existing) records.push(record);
@@ -1081,6 +1248,7 @@ async function receiveTerminalRequest() {
 }
 async function openHistory(record) {
   if (!maySwitchFile()) return;
+  if (removedHistoryIds.has(record.id)) { toast('该历史记录已移除，请通过打开按钮重新选择原文件。'); return; }
   const token = ++generation;
   let authorized = false;
   try {
@@ -1092,7 +1260,7 @@ async function openHistory(record) {
     }
     if (token !== generation) return;
     activate({ ...record, syncEnabled: false, lastSeenRaw: record.raw }, parseDocument(record.raw));
-    record.openedAt = Date.now(); renderHistory(); void storeRecord(record);
+    record.openedAt = Date.now(); renderHistory(); void storeRecord(record, { fields: ['openedAt'] });
     restorePendingEdit(record);
     syncStatus('历史快照', 'warning');
     notice(record.handle ? '尚未获得原文件读取权限，当前显示上次保存的快照。' : '当前显示历史快照。重新选择原文件可更新内容；是否自动同步取决于浏览器提供的读取权限。', { label: record.handle ? '重新授权' : '打开原文件', run: record.handle ? () => openHistory(record) : () => pickFile(record) });
