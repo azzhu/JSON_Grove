@@ -96,7 +96,7 @@ export function parseJsonviewArgs(args) {
 export async function launchJsonview(args) {
   const parsed = parseJsonviewArgs(args);
   if (parsed.help) {
-    console.log('用法：jsonview [--no-browser] [--] [JSON 文件路径]\n      jsonview --stop\n\n自动启动或复用本地服务，在 Edge 打开，修改实时写回原文件。不带路径时打开空白查看器。支持相对路径、绝对路径和带空格的路径。\n--no-browser  只输出打开地址\n--stop        停止本地服务（请先确认网页修改已保存）');
+    console.log('用法：jsonview [--no-browser] [--] [JSON / JSONL 文件路径]\n      jsonview --stop\n\n自动启动或复用本地服务，在 Edge 打开，修改实时写回原文件。不带路径时打开空白查看器。支持相对路径、绝对路径和带空格的路径。\n--no-browser  只输出打开地址\n--stop        停止本地服务（请先确认网页修改已保存）');
     return;
   }
   if (parsed.stop) {
@@ -109,7 +109,7 @@ export async function launchJsonview(args) {
   if (parsed.path) {
     path = await realpath(resolve(parsed.path));
     const info = await stat(path);
-    if (!info.isFile() || !/\.(json|jsonc)$/i.test(path)) throw new Error('请选择已有的 .json 或 .jsonc 文件');
+    if (!info.isFile() || !/\.(json|jsonc|jsonl)$/i.test(path)) throw new Error('请选择已有的 .json、.jsonc 或 .jsonl 文件');
     if (info.size > MAX_DOCUMENT_BYTES) throw new Error('请选择小于 20 MB 的 JSON 文件');
     await access(path, constants.R_OK | constants.W_OK);
   }

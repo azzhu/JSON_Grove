@@ -9,12 +9,25 @@ export const JSONVIEW_ROOT = fileURLToPath(new URL('.', import.meta.url));
 export const MAX_DOCUMENT_BYTES = 20 * 1024 * 1024;
 const fail = (message, status = 400) => Object.assign(new Error(message), { status });
 
+// JSONL stores one complete JSON value per nonblank physical line.
+export function validateDocument(content, name = '') {
+  const raw = content.replace(/^\uFEFF/, '');
+  if (!/\.jsonl$/i.test(name)) { JSON.parse(raw); return; }
+  let line = 0;
+  for (const text of raw.split(/\r\n|\n|\r/)) {
+    line++;
+    if (!text.trim()) continue;
+    try { JSON.parse(text); }
+    catch (error) { throw new Error(`JSONL 格式错误：第 ${line} 行。${error.message.slice(0, 180)}`); }
+  }
+}
+
 export class LocalDocumentStore {
   constructor() { this.byToken = new Map(); this.byPath = new Map(); }
 
   async register(filename) {
     const path = await realpath(filename);
-    if (!/\.(json|jsonc)$/i.test(path)) throw fail('请选择 .json 或 .jsonc 文件（标准 JSON）');
+    if (!/\.(json|jsonc|jsonl)$/i.test(path)) throw fail('请选择 .json、.jsonc 或 .jsonl 文件');
     await access(path, constants.R_OK | constants.W_OK);
     const info = await stat(path);
     if (!info.isFile()) throw fail('指定路径不是普通文件');
@@ -25,7 +38,7 @@ export class LocalDocumentStore {
       this.byPath.set(path, record); this.byToken.set(record.token, record);
     }
     const file = await this.read(record);
-    try { JSON.parse(file.content.replace(/^\uFEFF/, '')); } catch { throw fail('原文件不是有效的标准 JSON'); }
+    try { validateDocument(file.content, record.name); } catch (error) { throw fail(`原文件格式无效：${error.message}`); }
     return { id: record.id, name: record.name, path, token: record.token };
   }
 
@@ -53,7 +66,7 @@ export class LocalDocumentStore {
   write(record, expectedContent, content) {
     const operation = record.pending.catch(() => {}).then(async () => {
       if (typeof expectedContent !== 'string' || typeof content !== 'string' || Buffer.byteLength(content) > MAX_DOCUMENT_BYTES || Buffer.byteLength(expectedContent) > MAX_DOCUMENT_BYTES) throw fail('写入内容无效或超过 20 MB');
-      try { JSON.parse(content.replace(/^\uFEFF/, '')); } catch { throw fail('JSON 格式错误，未写入原文件'); }
+      try { validateDocument(content, record.name); } catch (error) { throw fail(`格式错误，未写入原文件：${error.message}`); }
       const check = async () => {
         const latest = await this.read(record);
         if (latest.content !== expectedContent) throw Object.assign(fail('原文件已被其他程序修改，已停止写入', 409), { content: latest.content });

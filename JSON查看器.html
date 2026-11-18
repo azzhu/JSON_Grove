@@ -91,11 +91,11 @@ body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=not
 <body>
   <aside class="sidebar">
     <div class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2218%22%20fill%3D%22%23d46a46%22%2F%3E%3Cpath%20d%3D%22M25%2016h-4c-4%200-5%203-5%207v3c0%204-2%206-5%206%203%200%205%202%205%206v3c0%204%201%207%205%207h4m14-32h4c4%200%205%203%205%207v3c0%204%202%206%205%206-3%200-5%202-5%206v3c0%204-1%207-5%207h-4%22%20fill%3D%22none%22%20stroke%3D%22%23fffaf3%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E" alt="" width="36" height="36"><span>JSON <b>Grove</b><small>数据，自有脉络。</small></span></div>
-    <button class="open-button" id="open-file"><span data-icon="plus"></span> 打开 JSON 文件 <kbd>⌘ O</kbd></button>
+    <button class="open-button" id="open-file"><span data-icon="plus"></span> 打开 JSON / JSONL <kbd>⌘ O</kbd></button>
     <div id="notice" class="notice" role="status" hidden></div>
     <div class="history-scroll" id="history-list"></div>
     <div class="sidebar-bottom">
-      <button class="drop-zone" id="drop-zone"><span class="drop-icon" data-icon="upload"></span><span><strong>拖入 JSON 文件</strong><small>或点击选择 · 最大 20 MB</small></span></button>
+      <button class="drop-zone" id="drop-zone"><span class="drop-icon" data-icon="upload"></span><span><strong>拖入 JSON / JSONL</strong><small>或点击选择 · 最大 20 MB</small></span></button>
       <div class="sidebar-help"><div class="sidebar-actions"><button class="settings-button" id="settings-button" title="网页风格设置" aria-haspopup="dialog"><span data-icon="settings"></span>设置</button><button class="help-button" id="help-button" title="使用帮助" aria-label="使用帮助"><span data-icon="help"></span>使用帮助</button></div><span class="sidebar-readonly"><span data-icon="lock"></span><span id="edit-mode">只读</span></span></div>
     </div>
   </aside>
@@ -113,7 +113,7 @@ body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=not
   <div class="drag-overlay" id="drag-overlay" hidden><div><span data-icon="upload"></span><h2>松开，打开文件</h2><p>一次查看一个 JSON 文件</p></div></div>
   <div class="toast" id="toast" role="status" hidden></div>
   <dialog id="value-dialog"><div class="dialog-heading"><h2 id="value-heading">字段内容</h2><button id="close-value" aria-label="关闭字段内容"><span data-icon="close"></span></button></div><p id="value-path"></p><textarea id="full-value" readonly spellcheck="false" aria-label="完整字段值"></textarea><p id="field-edit-status" class="edit-status" role="status"></p><div class="value-dialog-footer"><span id="value-type"></span><button id="discard-field">放弃未保存修改</button><button id="retry-field">保存 / 处理冲突</button><button id="copy-value"><span data-icon="copy"></span>复制值</button></div></dialog>
-  <dialog id="editor-dialog" aria-labelledby="editor-title"><div class="dialog-heading"><h2 id="editor-title">编辑 JSON</h2><button id="close-editor" aria-label="关闭 JSON 编辑器"><span data-icon="close"></span></button></div><p>支持修改字段名、增加 / 删除字段和调整结构。停止输入约 450 ms 后自动写回原文件，格式错误时不写入。</p><textarea id="json-editor" spellcheck="false" aria-label="JSON 源码编辑器"></textarea><p id="editor-status" class="edit-status" role="status"></p><div class="conflict-actions"><button id="discard-source">放弃未保存修改</button><button id="retry-editor">保存 / 处理冲突</button></div></dialog>
+  <dialog id="editor-dialog" aria-labelledby="editor-title"><div class="dialog-heading"><h2 id="editor-title">编辑 JSON</h2><button id="close-editor" aria-label="关闭 JSON 编辑器"><span data-icon="close"></span></button></div><p>支持修改字段名、增加 / 删除字段和调整结构。停止输入约 450 ms 后自动写回原文件；JSONL 每行填写一条 JSON，格式错误时不写入。</p><textarea id="json-editor" spellcheck="false" aria-label="JSON 源码编辑器"></textarea><p id="editor-status" class="edit-status" role="status"></p><div class="conflict-actions"><button id="discard-source">放弃未保存修改</button><button id="retry-editor">保存 / 处理冲突</button></div></dialog>
   <dialog id="conflict-dialog" aria-labelledby="conflict-title"><div class="dialog-heading"><h2 id="conflict-title">网页与原文件都有修改</h2></div><p>自动保存已暂停，两份内容均未覆盖。可以先复制网页草稿；采用原文件会放弃网页未保存修改。</p><div class="conflict-columns"><label>网页草稿<textarea id="conflict-draft" readonly spellcheck="false"></textarea></label><label>当前原文件<textarea id="conflict-disk" readonly spellcheck="false"></textarea></label></div><div class="conflict-actions"><button id="copy-conflict-draft">复制网页草稿</button><button id="keep-conflict">保留草稿，暂不保存</button><button id="use-disk">采用原文件，放弃草稿</button></div></dialog>
   <dialog id="discard-dialog"><div class="dialog-heading"><h2>放弃未保存的修改？</h2></div><p>将重新读取原文件，并放弃当前网页中的未保存修改。已经写回原文件的内容不会撤销。</p><div class="conflict-actions"><button id="cancel-discard">继续编辑</button><button id="confirm-discard">放弃修改并读取原文件</button></div></dialog>
   <dialog id="theme-dialog" aria-labelledby="theme-dialog-title"><div class="dialog-heading"><h2 id="theme-dialog-title">自定义 JSON 配色</h2><button id="close-theme" aria-label="关闭配色设置"><span data-icon="close"></span></button></div><p>正在修改「<strong id="theme-editor-name">经典浅色</strong>」。点击色块或输入颜色值，即时预览并自动保存；每套主题可以单独修改。</p><div class="theme-color-grid" id="theme-color-grid"></div><div class="theme-preview" id="theme-preview" aria-label="JSON 配色预览"><span class="node-bracket">{</span>
@@ -123,8 +123,8 @@ body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=not
   <span class="node-key">"empty"</span>: <span class="node-null">null</span>
 <span class="node-bracket">}</span></div><div class="theme-dialog-footer"><button id="reset-theme">恢复当前主题默认配色</button><button id="finish-theme">完成</button></div></dialog>
   <dialog id="settings-dialog" aria-labelledby="settings-title"><div class="dialog-heading"><h2 id="settings-title">设置</h2><button id="close-settings" aria-label="关闭设置"><span data-icon="close"></span></button></div><p class="settings-intro">网页风格只调整界面外观，与 JSON 内容配色、字号和缩进独立。</p><h3>网页风格</h3><div id="ui-style-options" class="style-options" role="group" aria-label="选择网页风格"></div><div class="settings-footer"><small>选择后自动保存并关闭设置。</small><button id="finish-settings">完成</button></div></dialog>
-  <dialog id="help-dialog"><div class="dialog-heading"><h2>让数据更好读</h2><button id="close-help" aria-label="关闭帮助"><span data-icon="close"></span></button></div><p>左下角「设置」可选择网页风格；右上角「配色」只调整 JSON 内容颜色，两者互不影响。</p><p>点击「打开 JSON 文件」或将文件拖入网页。历史记录保存在当前浏览器中，图钉可将常用文件置顶。</p><p>文件选择窗口会优先从上次打开的位置开始；重新打开网页后，也会参考历史文件的位置。普通文件选择模式下，起始位置由 Edge 自行管理。</p><p>右上方「配色」可以切换主题或自定义颜色；「Aa」可弹出字号面板，用滑块、加减按钮或输入数字调整大小。「缩进」可调整树形层级间距。配色、字号和缩进即时生效并自动记住。</p><p>获得写入授权后，双击节点或点击「编辑字段」可修改值；「编辑 JSON」可修改完整文件，支持字段增删和改名。字符串直接输入文字，其他类型输入有效 JSON。停止输入约 450 ms 后自动写回原文件，格式错误时保留草稿并暂停写入。搜索会自动展开匹配内容所在的路径。</p><p>「一级展开」显示根节点的直接字段；二级到四级逐层深入。搜索期间点击展开级别会清空搜索并切换层级。</p><p>双击 HTML 可独立使用；终端执行 jsonview 文件.json 会自动启动或复用本地服务，直接打开原文件。服务方式需要 Node.js 18+；关闭浏览器后服务继续运行，执行 jsonview --stop 停止服务。页面隐藏时停止文件检查。</p><p>授权读取原文件后，页面可见时约每秒检查一次外部修改。切回页面时也会立即检查。格式错误时保留上次有效的树形视图。</p><p>重新打开浏览器后，历史文件可能需要再次授权。如果当前浏览器限制本地页面的文件读取权限，会改用文件快照并明确提示无法自动同步；可重新选择文件更新内容。</p><div class="shortcut-row"><span>打开文件</span><kbd>⌘ / Ctrl + O</kbd></div><div class="shortcut-row"><span>搜索</span><kbd>⌘ / Ctrl + K</kbd></div><div class="shortcut-row"><span>选择节点后展开 / 收起</span><kbd>← / →</kbd></div><p class="help-note">修改直接写回已授权的原文件，不上传。写入前核对外部修改；存在冲突时暂停保存。关闭页面前请确认状态为「已保存到原文件」。</p></dialog>
-  <input type="file" id="file-input" accept=".json,.jsonc,application/json" hidden>
+  <dialog id="help-dialog"><div class="dialog-heading"><h2>让数据更好读</h2><button id="close-help" aria-label="关闭帮助"><span data-icon="close"></span></button></div><p>左下角「设置」可选择网页风格；右上角「配色」只调整 JSON 内容颜色，两者互不影响。</p><p>点击「打开 JSON / JSONL」或将文件拖入网页。历史记录保存在当前浏览器中，图钉可将常用文件置顶。</p><p>支持 .jsonl：每个非空行是一条独立 JSON 记录，按列表展示；空行忽略，错误会提示原始行号。编辑后仍按行保存。</p><p>文件选择窗口会优先从上次打开的位置开始；重新打开网页后，也会参考历史文件的位置。普通文件选择模式下，起始位置由 Edge 自行管理。</p><p>右上方「配色」可以切换主题或自定义颜色；「Aa」可弹出字号面板，用滑块、加减按钮或输入数字调整大小。「缩进」可调整树形层级间距。配色、字号和缩进即时生效并自动记住。</p><p>获得写入授权后，双击节点或点击「编辑字段」可修改值；「编辑 JSON」可修改完整文件，支持字段增删和改名。字符串直接输入文字，其他类型输入有效 JSON。停止输入约 450 ms 后自动写回原文件，格式错误时保留草稿并暂停写入。搜索会自动展开匹配内容所在的路径。</p><p>「一级展开」显示根节点的直接字段；二级到四级逐层深入。搜索期间点击展开级别会清空搜索并切换层级。</p><p>双击 HTML 可独立使用；终端执行 jsonview 文件.json 会自动启动或复用本地服务，直接打开原文件。服务方式需要 Node.js 18+；关闭浏览器后服务继续运行，执行 jsonview --stop 停止服务。页面隐藏时停止文件检查。</p><p>授权读取原文件后，页面可见时约每秒检查一次外部修改。切回页面时也会立即检查。格式错误时保留上次有效的树形视图。</p><p>重新打开浏览器后，历史文件可能需要再次授权。如果当前浏览器限制本地页面的文件读取权限，会改用文件快照并明确提示无法自动同步；可重新选择文件更新内容。</p><div class="shortcut-row"><span>打开文件</span><kbd>⌘ / Ctrl + O</kbd></div><div class="shortcut-row"><span>搜索</span><kbd>⌘ / Ctrl + K</kbd></div><div class="shortcut-row"><span>选择节点后展开 / 收起</span><kbd>← / →</kbd></div><p class="help-note">修改直接写回已授权的原文件，不上传。写入前核对外部修改；存在冲突时暂停保存。关闭页面前请确认状态为「已保存到原文件」。</p></dialog>
+  <input type="file" id="file-input" accept=".json,.jsonc,.jsonl,application/json,application/jsonl,application/x-ndjson" hidden>
   <script>(async function () {
 'use strict';
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -137,8 +137,50 @@ function jsonPath(parts) {
   return '$' + parts.map(part => typeof part === 'number' ? `[${part}]` : /^[A-Za-z_$][\w$]*$/.test(part) ? `.${part}` : `[${JSON.stringify(part)}]`).join('');
 }
 
+function isJsonLines(name = '') { return /\.jsonl$/i.test(name); }
+// Keep source offsets and physical line numbers, including blank lines and CRLF.
+function* jsonLines(text) {
+  const newline = /\r\n|\n|\r/g;
+  let start = text.charCodeAt(0) === 0xfeff ? 1 : 0, line = 1, match;
+  while ((match = newline.exec(text))) {
+    const value = text.slice(start, match.index);
+    if (value.trim()) yield { text: value, start, end: match.index, line };
+    start = newline.lastIndex; line++;
+  }
+  const value = text.slice(start);
+  if (value.trim()) yield { text: value, start, end: text.length, line };
+}
+function jsonLineError(error, line) {
+  return Object.assign(new Error(`JSONL 格式错误：第 ${line} 行。${error.message.slice(0, 180)}`), { code: 'JSONL_LINE', line });
+}
+// Remove only JSON whitespace outside strings; never round-trip number tokens.
+function compactJsonSource(text) {
+  let result = '', quoted = false;
+  for (let index = 0; index < text.length; index++) {
+    const char = text[index];
+    if (quoted && char === '\\') { result += char + text[++index]; continue; }
+    if (char === '"') quoted = !quoted;
+    if (quoted || !/\s/.test(char)) result += char;
+  }
+  return result;
+}
+
 // Read the number token from the original source to preserve integers beyond 2^53.
-function parseDocument(text) {
+function parseDocument(text, name = '') {
+  if (isJsonLines(name)) {
+    const data = [], numbers = new WeakMap(), rootNumbers = new Map(), sources = [];
+    for (const row of jsonLines(text)) {
+      if (data.length >= 100000) throw new Error('文件超过 100,000 条记录，请拆分后查看。');
+      let parsed;
+      try { parsed = parseDocument(row.text); } catch (error) { throw jsonLineError(error, row.line); }
+      const index = data.length; data.push(parsed.data);
+      if (parsed.rootNumberSource !== undefined) rootNumbers.set(String(index), parsed.rootNumberSource);
+      // Each record retains its own number-source map, including decoded strings.
+      sources.push(parsed);
+    }
+    numbers.set(data, rootNumbers);
+    return { raw: text, data, numbers, recordSources: sources, jsonl: true };
+  }
   const raw = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text;
   const numbers = new WeakMap();
   let rootNumberSource;
@@ -188,7 +230,7 @@ function buildIndex(data, sources = {}) {
     stack.push({ end: node.index });
     for (let i = keys.length - 1; i >= 0; i--) {
       const key = type === 'array' ? Number(keys[i]) : keys[i];
-      stack.push({ value: value[key], key, parts: [...item.parts, key], depth: item.depth + 1, parent: node.index, numberSource: childSources?.numbers?.get(value)?.get(String(key)), sources: childSources, inDecodedString: item.inDecodedString || decodedString });
+      stack.push({ value: value[key], key, parts: [...item.parts, key], depth: item.depth + 1, parent: node.index, numberSource: childSources?.numbers?.get(value)?.get(String(key)), sources: item.depth === 0 && itemSources.recordSources ? itemSources.recordSources[key] : childSources, inDecodedString: item.inDecodedString || decodedString });
     }
   }
   return { nodes, totals };
@@ -276,7 +318,13 @@ function sourceTree(raw) {
   }
   return read();
 }
-function jsonValueSource(raw, parts) {
+function jsonValueSource(raw, parts, name = '') {
+  if (isJsonLines(name)) {
+    if (!parts.length) return '[' + [...jsonLines(raw)].map(row => row.text).join(',') + ']';
+    const row = [...jsonLines(raw)][parts[0]];
+    if (!row) throw new Error('该记录已在外部修改或移除，请重新选择。');
+    return jsonValueSource(row.text, parts.slice(1));
+  }
   function visit(node, offset) {
     if (offset === parts.length) return raw.slice(node.start, node.end);
     if (node.type === 'string') return jsonValueSource(node.value, parts.slice(offset));
@@ -286,7 +334,20 @@ function jsonValueSource(raw, parts) {
   }
   return visit(sourceTree(raw), 0);
 }
-function replaceJsonValue(raw, parts, replacement) {
+function replaceJsonValue(raw, parts, replacement, name = '') {
+  if (isJsonLines(name)) {
+    JSON.parse(replacement);
+    if (!parts.length) {
+      const tree = sourceTree(replacement);
+      if (tree.type !== 'array') throw new Error('JSONL 根节点应为记录数组；也可使用「编辑 JSON」逐行编辑原文。');
+      const eol = raw.match(/\r\n|\n|\r/)?.[0] || '\n';
+      return (raw.startsWith('\uFEFF') ? '\uFEFF' : '') + [...tree.children.values()].map(node => compactJsonSource(replacement.slice(node.start, node.end))).join(eol) + (/[\r\n]$/.test(raw) && tree.children.size ? eol : '');
+    }
+    const row = [...jsonLines(raw)][parts[0]];
+    if (!row) throw new Error('该记录已在外部修改或移除，请重新选择。');
+    const updated = replaceJsonValue(row.text, parts.slice(1), compactJsonSource(replacement));
+    return raw.slice(0, row.start) + updated + raw.slice(row.end);
+  }
   JSON.parse(replacement);
   function visit(node, offset) {
     if (offset === parts.length) return raw.slice(0, node.start) + replacement + raw.slice(node.end);
@@ -303,10 +364,10 @@ function replaceJsonValue(raw, parts, replacement) {
 
 // All writes are serialized and compare disk contents before opening a stream.
 class JsonFileWriter {
-  constructor(handle, diskRaw) { this.handle = handle; this.diskRaw = diskRaw; this.pending = Promise.resolve(); }
+  constructor(handle, diskRaw, name = handle.name || '') { this.handle = handle; this.name = name; this.diskRaw = diskRaw; this.pending = Promise.resolve(); }
   save(raw) {
     const operation = this.pending.catch(() => {}).then(async () => {
-      JSON.parse(raw.replace(/^\uFEFF/, ''));
+      parseDocument(raw, this.name);
       if (new Blob([raw]).size > MAX_FILE_SIZE) throw new Error('修改后的文件超过 20 MB。');
       if (await this.handle.queryPermission({ mode: 'readwrite' }) !== 'granted') throw Object.assign(new Error('写入权限已失效，请点击「授权编辑」重新授权。'), { code: 'WRITE_PERMISSION' });
       if (typeof this.handle.writeIfUnchanged === 'function') {
@@ -753,7 +814,7 @@ async function rememberEditState() {
 }
 function createEditSession(file, diskRaw, writeAllowed) {
   clearTimeout(inputTimer); clearTimeout(editSession?.saveTimer); editor = null;
-  editSession = { id: file.id, diskRaw, writer: file.handle && (typeof file.handle.createWritable === 'function' || typeof file.handle.writeIfUnchanged === 'function') ? new JsonFileWriter(file.handle, diskRaw) : null, writeAllowed, dirty: false, writing: false, saveTimer: null, error: '', validationError: '', conflict: null, editorDraft: null };
+  editSession = { id: file.id, diskRaw, writer: file.handle && (typeof file.handle.createWritable === 'function' || typeof file.handle.writeIfUnchanged === 'function') ? new JsonFileWriter(file.handle, diskRaw, file.name) : null, writeAllowed, dirty: false, writing: false, saveTimer: null, error: '', validationError: '', conflict: null, editorDraft: null };
   updateEditStatus();
 }
 function currentEditorArea() { return editor?.kind === 'source' ? $('json-editor') : $('full-value'); }
@@ -762,7 +823,7 @@ function refreshOpenEditor() {
   try {
     if (editor.kind === 'source') currentEditorArea().value = active.raw;
     else {
-      const token = jsonValueSource(active.raw, editor.parts);
+      const token = jsonValueSource(active.raw, editor.parts, active.name);
       const value = JSON.parse(token);
       editor.asText = typeof value === 'string';
       currentEditorArea().value = editor.asText ? value : token;
@@ -770,7 +831,7 @@ function refreshOpenEditor() {
   } catch { $('value-dialog').close(); editor = null; toast('正在查看的字段已在外部移除。'); }
 }
 async function grantEditing() {
-  if (!active?.handle || !editSession) { toast('请通过「打开 JSON 文件」选择原文件并授予读写权限。'); return; }
+  if (!active?.handle || !editSession) { toast('请通过「打开 JSON / JSONL」选择原文件并授予读写权限。'); return; }
   const session = editSession, handle = active.handle;
   try {
     // Request from this explicit click, never from the background poller.
@@ -796,7 +857,7 @@ function showSourceEditor() {
   editor = { kind: 'source', session: editSession };
   const draft = editSession.editorDraft;
   $('json-editor').value = draft?.kind === 'source' ? draft.text : active.raw;
-  $('editor-title').textContent = `编辑 JSON · ${active.name}`;
+  $('editor-title').textContent = `编辑 ${isJsonLines(active.name) ? 'JSONL' : 'JSON'} · ${active.name}`;
   $('editor-dialog').showModal(); updateEditStatus();
 }
 function showEditableValue(index) {
@@ -806,7 +867,7 @@ function showEditableValue(index) {
     if (pendingNode) index = pendingNode.index;
   }
   const node = nodes[index]; if (!node) return;
-  const token = jsonValueSource(active.raw, node.parts);
+  const token = jsonValueSource(active.raw, node.parts, active.name);
   const writable = !!editSession?.writeAllowed && !editSession.conflict;
   editor = { kind: 'field', session: editSession, parts: [...node.parts], asText: node.decodedString || node.type === 'string' };
   $('value-heading').textContent = `${writable ? '编辑' : '查看'} · ${node.depth ? String(node.key).slice(0, 100) : '根节点'}`;
@@ -834,9 +895,9 @@ async function processEditorInput() {
   try {
     let raw;
     if (draft.kind === 'source') raw = (session.diskRaw.startsWith('\uFEFF') && !draft.text.startsWith('\uFEFF') ? '\uFEFF' : '') + draft.text;
-    else raw = replaceJsonValue(active.raw, draft.parts, draft.asText ? JSON.stringify(draft.text) : draft.text);
+    else raw = replaceJsonValue(active.raw, draft.parts, draft.asText ? JSON.stringify(draft.text) : draft.text, active.name);
     if (new Blob([raw]).size > MAX_FILE_SIZE) throw new Error('修改后的文件超过 20 MB。');
-    const parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed);
+    const parsed = parseDocument(raw, active.name); parsed.indexed = buildIndex(parsed.data, parsed);
     session.editorDraft = null; session.validationError = ''; session.error = '';
     session.dirty = raw !== session.diskRaw;
     activate({ ...active, raw }, parsed, true);
@@ -901,7 +962,7 @@ async function adoptDisk() {
     const file = await active.handle.getFile(); const raw = await file.text();
     if (session !== editSession) return;
     if (file.size > MAX_FILE_SIZE) throw new Error('原文件超过 20 MB，无法加载。');
-    const parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed);
+    const parsed = parseDocument(raw, active.name); parsed.indexed = buildIndex(parsed.data, parsed);
     clearTimeout(inputTimer); editor = null;
     for (const id of ['value-dialog', 'editor-dialog', 'conflict-dialog']) if ($(id).open) $(id).close();
     session.diskRaw = raw; if (session.writer) session.writer.diskRaw = raw;
@@ -927,7 +988,7 @@ function restorePendingEdit(record) {
   const session = editSession;
   session.draftOwner = record._pendingOwner;
   try {
-    const parsed = parseDocument(pending.raw); parsed.indexed = buildIndex(parsed.data, parsed);
+    const parsed = parseDocument(pending.raw, record.name); parsed.indexed = buildIndex(parsed.data, parsed);
     session.dirty = pending.raw !== session.diskRaw;
     session.editorDraft = pending.editorDraft || null;
     activate({ ...active, raw: pending.raw }, parsed, true);
@@ -1015,7 +1076,7 @@ async function syncHistory(force = false) {
         if (active.handle && active.syncEnabled) void pollFile(true);
         else {
           try {
-            const parsed = parseDocument(current.raw);
+            const parsed = parseDocument(current.raw, current.name);
             editSession.diskRaw = current.raw;
             if (editSession.writer) editSession.writer.diskRaw = current.raw;
             activate({ ...active, raw: current.raw, size: current.size, lastModified: current.lastModified }, parsed, true);
@@ -1246,6 +1307,7 @@ function readError(error) {
   return error?.message || '无法读取文件，请重新打开。';
 }
 function syntaxError(error, text) {
+  if (error.code === 'JSONL_LINE') return error.message;
   const match = /position (\d+)/i.exec(error.message);
   if (match) {
     const prefix = text.slice(0, Number(match[1]));
@@ -1263,7 +1325,7 @@ async function loadFile(file, handle = null, knownRecord = null, token = ++gener
     const raw = await file.text();
     if (token !== generation) return;
     let parsed;
-    try { parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed); }
+    try { parsed = parseDocument(raw, file.name); parsed.indexed = buildIndex(parsed.data, parsed); }
     catch (error) { notice(`${file.name}：${error instanceof SyntaxError ? syntaxError(error, raw) : error.message} 当前视图保持不变。`, null, true); return; }
     let existing = knownRecord && !removedHistoryIds.has(knownRecord.id) ? knownRecord : null;
     if (!existing && handle) {
@@ -1304,7 +1366,7 @@ function filePickerOptions() {
     id: 'json-grove-open',
     mode: 'readwrite',
     multiple: false,
-    types: [{ description: 'JSON 文件', accept: { 'application/json': ['.json', '.jsonc'] } }],
+    types: [{ description: 'JSON / JSONL 文件', accept: { 'application/json': ['.json', '.jsonc', '.jsonl'] } }],
     ...(startIn ? { startIn } : {}),
   };
 }
@@ -1367,7 +1429,7 @@ async function openHistory(record) {
       if (authorized) { await loadFile(await record.handle.getFile(), record.handle, record, token); return; }
     }
     if (token !== generation) return;
-    activate({ ...record, syncEnabled: false, lastSeenRaw: record.raw }, parseDocument(record.raw));
+    activate({ ...record, syncEnabled: false, lastSeenRaw: record.raw }, parseDocument(record.raw, record.name));
     record.openedAt = Date.now(); renderHistory(); void storeRecord(record, { fields: ['openedAt'] });
     restorePendingEdit(record);
     syncStatus('历史快照', 'warning');
@@ -1375,7 +1437,7 @@ async function openHistory(record) {
   } catch (error) {
     if (token !== generation) return;
     if (record.raw !== undefined) {
-      try { activate({ ...record, syncEnabled: false }, parseDocument(record.raw)); } catch { /* Leave the last valid view intact. */ }
+      try { activate({ ...record, syncEnabled: false }, parseDocument(record.raw, record.name)); } catch { /* Leave the last valid view intact. */ }
     }
     syncStatus('同步已暂停', 'error'); notice(`${readError(error)} 当前保留历史快照。`, { label: '重新打开', run: () => pickFile(record) }, true);
   }
@@ -1451,7 +1513,7 @@ function renderTree(focusId) {
     const value = document.createElement('span'); value.className = `node-${node.container ? 'bracket' : node.type}`;
     if (node.container) {
       value.textContent = node.type === 'array' ? (node.count ? '[ … ]' : '[ ]') : (node.count ? '{ … }' : '{ }');
-      const summary = document.createElement('span'); summary.className = 'node-summary'; summary.textContent = `${node.count} ${node.type === 'array' ? '项' : '个字段'}`;
+      const summary = document.createElement('span'); summary.className = 'node-summary'; summary.textContent = `${node.count} ${node.depth === 0 && isJsonLines(active.name) ? '条记录 · JSONL' : node.type === 'array' ? '项' : '个字段'}`;
       row.append(value, summary);
       if (node.decodedString) {
         const badge = document.createElement('button');
@@ -1550,7 +1612,7 @@ async function pollFile(force = false) {
     if (raw === active.lastSeenRaw && session.validationError) return;
     active.lastSeenRaw = raw;
     let parsed;
-    try { parsed = parseDocument(raw); parsed.indexed = buildIndex(parsed.data, parsed); }
+    try { parsed = parseDocument(raw, active.name); parsed.indexed = buildIndex(parsed.data, parsed); }
     catch (error) {
       session.validationError = `原文件格式错误，保留上次有效视图。${error.message}`;
       notice(`原文件更新，但${error instanceof SyntaxError ? syntaxError(error, raw) : error.message} 修复原文件后会自动更新。`, null, true);
@@ -1702,7 +1764,7 @@ document.addEventListener('drop', async event => {
   if (!maySwitchFile()) return;
   const token = ++generation;
   const items = Array.from(event.dataTransfer.items).filter(item => item.kind === 'file');
-  if (items.length !== 1) { toast('请一次拖入一个 JSON 文件。'); return; }
+  if (items.length !== 1) { toast('请一次拖入一个 JSON / JSONL 文件。'); return; }
   const item = items[0], fallbackFile = item.getAsFile();
   // Request the handle during the drop event, before the first await.
   try {
