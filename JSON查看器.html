@@ -774,23 +774,36 @@ let editSession = null, editor = null, inputTimer, focusCheckPending = false;
 function editingPending(session = editSession) { return !!session && (session.dirty || session.writing || !!session.editorDraft); }
 function maySwitchFile() {
   if (!editingPending()) return true;
+  if (active?.temporary) return window.confirm('剪切板内容有临时修改，离开后将丢失。确定放弃并继续？');
   toast('当前有尚未保存的修改，请先保存、处理冲突，或点击「放弃未保存修改」。');
   return false;
 }
 function updateEditStatus() {
   const session = editSession;
-  const writable = !!session?.writeAllowed && !!session.writer;
+  const writable = !!session?.writeAllowed && (!!session.writer || !!active?.temporary);
   $('enable-edit').hidden = writable || !!active?.sample;
   $('enable-edit').disabled = !active?.handle;
   $('edit-json').disabled = !writable || !!session?.conflict;
   $('edit-field').disabled = !writable || !!session?.conflict;
   $('discard-edit').hidden = !editingPending(session) && !session?.conflict;
   $('discard-source').disabled = $('discard-field').disabled = !editingPending(session) && !session?.conflict;
-  $('retry-editor').disabled = $('retry-field').disabled = !session?.writer;
-  $('edit-mode').textContent = writable ? '自动保存' : '只读';
+  $('retry-editor').disabled = $('retry-field').disabled = !session?.writer && !active?.temporary;
+  $('edit-mode').textContent = active?.temporary ? '临时编辑' : writable ? '自动保存' : '只读';
+  $('edit-json').title = active?.temporary ? '编辑完整 JSON，仅在页面临时保留' : '编辑完整 JSON，停止输入自动保存';
+  $('editor-dialog').querySelector('p').textContent = active?.temporary ? '支持修改字段与结构。停止输入约 450 ms 后更新视图；不会写入文件或保存历史。' : '支持修改字段名、增加 / 删除字段和调整结构。停止输入约 450 ms 后自动写回原文件；JSONL 每行填写一条 JSON，格式错误时不写入。';
+  $('retry-editor').textContent = $('retry-field').textContent = active?.temporary ? '应用输入' : '保存 / 处理冲突';
   $('json-editor').readOnly = !writable || !!session?.conflict;
   if (editor?.session === session && editor.kind === 'field') $('full-value').readOnly = !writable || !!session?.conflict;
   if (!session || active?.sample) return;
+  if (active?.temporary) {
+    const hint = session.validationError || '仅在当前页面临时编辑，不写入文件，不保存历史。离开或刷新后丢失。';
+    syncStatus(session.validationError ? '格式错误 · 临时草稿' : editingPending(session) ? '临时修改 · 未保存到文件' : '剪切板 · 临时内容', session.validationError ? 'error' : 'warning');
+    $('sync-status').title = '仅校验并应用输入，不会写入文件';
+    $('editor-status').textContent = $('field-edit-status').textContent = hint;
+    $('editor-status').classList.toggle('edit-error', !!session.validationError);
+    $('field-edit-status').classList.toggle('edit-error', !!session.validationError);
+    return;
+  }
   let text = '', state = '';
   if (session.writing) text = '正在写回原文件…';
   else if (session.conflict) { text = '外部修改冲突 · 点击处理'; state = 'error'; }
@@ -807,7 +820,7 @@ function updateEditStatus() {
 }
 async function rememberEditState() {
   const session = editSession;
-  if (!session || active?.id !== session.id || active.sample) return;
+  if (!session || active?.id !== session.id || active.sample || active.temporary) return;
   const record = records.find(record => record.id === session.id); if (!record) return;
   Object.assign(record, { raw: session.diskRaw, size: active.size, lastModified: active.lastModified });
   if (session.dirty || session.editorDraft) record.pendingEdit = { baseRaw: session.diskRaw, raw: active.raw, editorDraft: session.editorDraft };
@@ -850,7 +863,7 @@ async function grantEditing() {
   } catch (error) { toast(error.message); }
 }
 function showSourceEditor() {
-  if (!editSession?.writeAllowed || !editSession.writer) { void grantEditing(); return; }
+  if (!editSession?.writeAllowed || (!editSession.writer && !active?.temporary)) { void grantEditing(); return; }
   if (editSession.editorDraft?.kind === 'field') {
     const pendingNode = nodes.find(node => JSON.stringify(node.parts) === JSON.stringify(editSession.editorDraft.parts));
     if (pendingNode) { showEditableValue(pendingNode.index); return; }
@@ -878,7 +891,7 @@ function showEditableValue(index) {
   const draft = editSession?.editorDraft;
   if (draft?.kind === 'field' && JSON.stringify(draft.parts) === JSON.stringify(node.parts)) $('full-value').value = draft.text;
   $('full-value').readOnly = !writable;
-  $('value-type').textContent = `${node.decodedString ? 'JSON 字符串原文（保存时保持字符串）' : node.type} · ${writable ? '停止输入自动保存' : '只读'}`;
+  $('value-type').textContent = `${node.decodedString ? 'JSON 字符串原文（保存时保持字符串）' : node.type} · ${active.temporary ? '临时编辑，不保存' : writable ? '停止输入自动保存' : '只读'}`;
   $('value-dialog').showModal(); updateEditStatus();
 }
 function queueEditorInput() {
@@ -902,9 +915,9 @@ async function processEditorInput() {
     const parsed = parseDocument(raw, active.name); parsed.indexed = buildIndex(parsed.data, parsed);
     session.editorDraft = null; session.validationError = ''; session.error = '';
     session.dirty = raw !== session.diskRaw;
-    activate({ ...active, raw }, parsed, true);
+    activate({ ...active, raw, ...(active.temporary ? { size: new Blob([raw]).size } : {}) }, parsed, true);
     updateEditStatus(); await rememberEditState();
-    if (session === editSession && session.dirty) await flushSave();
+    if (session === editSession && session.dirty && !active.temporary) await flushSave();
   } catch (error) {
     session.validationError = error instanceof SyntaxError ? syntaxError(error, draft.text) : error.message;
     updateEditStatus(); await rememberEditState();
@@ -918,7 +931,7 @@ function setFileConflict(diskRaw) {
 }
 async function flushSave() {
   const session = editSession;
-  if (!session || !session.dirty || session.conflict || session.validationError || session.editorDraft) return;
+  if (!session || active?.temporary || !session.dirty || session.conflict || session.validationError || session.editorDraft) return;
   if (session.writing) return session.writePromise;
   if (!session.writer || !session.writeAllowed) { session.error = '请先授权编辑，修改尚未写回。'; updateEditStatus(); return; }
   const raw = active.raw;
@@ -958,6 +971,14 @@ function showConflict() {
   $('conflict-dialog').showModal();
 }
 async function adoptDisk() {
+  if (active?.temporary) {
+    const raw = editSession.diskRaw, parsed = parseDocument(raw);
+    parsed.indexed = buildIndex(parsed.data, parsed);
+    clearTimeout(inputTimer);
+    for (const id of ['value-dialog', 'editor-dialog']) if ($(id).open) $(id).close();
+    activate({ ...active, raw, size: new Blob([raw]).size }, parsed);
+    return;
+  }
   if (!active?.handle || editSession?.writing) return;
   const session = editSession;
   try {
@@ -980,6 +1001,11 @@ function closeEditor(id) {
   $(id).close(); editor = null;
 }
 async function saveNow() {
+  if (active?.temporary) {
+    if (editSession?.editorDraft) await processEditorInput();
+    else toast('剪切板内容仅临时保留，可用「复制 JSON」复制当前内容。');
+    return;
+  }
   if (editSession?.conflict) { showConflict(); return; }
   if (!editSession?.writeAllowed) { await grantEditing(); return; }
   if (editSession.editorDraft) await processEditorInput(); else if (editSession.dirty) await flushSave(); else await resumePoll();
@@ -1196,7 +1222,7 @@ function storeRecord(record, options = {}) {
 }
 async function saveActive() {
   if (editSession) { await rememberEditState(); return; }
-  if (!active || active.sample) return;
+  if (!active || active.sample || active.temporary) return;
   const record = records.find(r => r.id === active.id);
   if (!record) return;
   Object.assign(record, { raw: active.raw, size: active.size, lastModified: active.lastModified });
@@ -1256,7 +1282,7 @@ function renderHistory() {
 }
 
 function rememberView() {
-  if (active) viewStates.set(active.id, { expanded: new Set(expanded), selectedId, scrollTop: $('tree-viewport').scrollTop, scrollLeft: $('tree-viewport').scrollLeft, query, rowLimit });
+  if (active && !active.temporary) viewStates.set(active.id, { expanded: new Set(expanded), selectedId, scrollTop: $('tree-viewport').scrollTop, scrollLeft: $('tree-viewport').scrollLeft, query, rowLimit });
 }
 function activate(file, parsed, keepView = false) {
   if (!keepView) rememberView();
@@ -1707,7 +1733,11 @@ $('edit-json').onclick = showSourceEditor;
 $('edit-field').onclick = () => { const node = nodes.find(node => node.id === selectedId); if (node) showEditableValue(node.index); };
 $('json-editor').oninput = $('full-value').oninput = queueEditorInput;
 $('close-editor').onclick = () => closeEditor('editor-dialog');
-$('discard-edit').onclick = $('discard-source').onclick = $('discard-field').onclick = () => { $('discard-dialog').showModal(); };
+$('discard-edit').onclick = $('discard-source').onclick = $('discard-field').onclick = () => {
+  $('discard-dialog').querySelector('p').textContent = active?.temporary ? '将恢复最初打开的剪切板内容，放弃所有临时修改；不会重新读取剪切板。' : '将重新读取原文件，并放弃当前网页中的未保存修改。已经写回原文件的内容不会撤销。';
+  $('confirm-discard').textContent = active?.temporary ? '放弃临时修改' : '放弃修改并读取原文件';
+  $('discard-dialog').showModal();
+};
 $('retry-editor').onclick = $('retry-field').onclick = saveNow;
 $('cancel-discard').onclick = () => $('discard-dialog').close();
 $('confirm-discard').onclick = async () => { $('discard-dialog').close(); await adoptDisk(); };
