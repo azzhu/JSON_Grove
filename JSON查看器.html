@@ -95,6 +95,7 @@ body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=not
     <div id="notice" class="notice" role="status" hidden></div>
     <div class="history-scroll" id="history-list"></div>
     <div class="sidebar-bottom">
+      <button class="drop-zone" id="open-clipboard" style="margin-bottom:10px;justify-content:center"><span data-icon="copy"></span>打开剪切板内容</button>
       <button class="drop-zone" id="drop-zone"><span class="drop-icon" data-icon="upload"></span><span><strong>拖入 JSON / JSONL</strong><small>或点击选择 · 最大 20 MB</small></span></button>
       <div class="sidebar-help"><div class="sidebar-actions"><button class="settings-button" id="settings-button" title="网页风格设置" aria-haspopup="dialog"><span data-icon="settings"></span>设置</button><button class="help-button" id="help-button" title="使用帮助" aria-label="使用帮助"><span data-icon="help"></span>使用帮助</button></div><span class="sidebar-readonly"><span data-icon="lock"></span><span id="edit-mode">只读</span></span></div>
     </div>
@@ -112,6 +113,7 @@ body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=not
   <div id="indent-popover" popover="auto" class="appearance-popover" role="dialog" aria-labelledby="indent-popover-title"><div class="appearance-heading"><label id="indent-popover-title" for="json-indent">层级缩进</label><div class="font-size-value"><input id="json-indent" type="number" min="8" max="64" step="1" value="28" inputmode="numeric" aria-label="JSON 层级缩进（8 至 64 像素）"><span>px</span></div></div><div class="font-size-controls"><button id="decrease-indent" title="减小缩进" aria-label="减小 JSON 缩进">−</button><input id="json-indent-range" type="range" min="8" max="64" step="1" value="28" aria-label="滑动调整 JSON 缩进"><button id="increase-indent" title="增大缩进" aria-label="增大 JSON 缩进">+</button></div><p class="appearance-note">仅调整树形层级间距，不修改 JSON 文件。</p><button id="reset-indent" class="appearance-reset">恢复默认缩进</button></div>
   <div class="drag-overlay" id="drag-overlay" hidden><div><span data-icon="upload"></span><h2>松开，打开文件</h2><p>一次查看一个 JSON 文件</p></div></div>
   <div class="toast" id="toast" role="status" hidden></div>
+  <dialog id="clipboard-dialog" aria-labelledby="clipboard-title"><div class="dialog-heading"><h2 id="clipboard-title">粘贴 JSON 内容</h2><button id="close-clipboard" aria-label="关闭粘贴窗口"><span data-icon="close"></span></button></div><p>无法直接读取剪切板，请在下方粘贴 JSON。内容仅保留在当前页面，不保存到历史记录。</p><textarea id="clipboard-input" spellcheck="false" aria-label="剪切板 JSON 内容" style="width:100%;height:35vh;resize:vertical;font-family:var(--mono)"></textarea><p id="clipboard-error" role="alert"></p><button class="drop-zone" id="confirm-clipboard">可视化 JSON</button></dialog>
   <dialog id="value-dialog"><div class="dialog-heading"><h2 id="value-heading">字段内容</h2><button id="close-value" aria-label="关闭字段内容"><span data-icon="close"></span></button></div><p id="value-path"></p><textarea id="full-value" readonly spellcheck="false" aria-label="完整字段值"></textarea><p id="field-edit-status" class="edit-status" role="status"></p><div class="value-dialog-footer"><span id="value-type"></span><button id="discard-field">放弃未保存修改</button><button id="retry-field">保存 / 处理冲突</button><button id="copy-value"><span data-icon="copy"></span>复制值</button></div></dialog>
   <dialog id="editor-dialog" aria-labelledby="editor-title"><div class="dialog-heading"><h2 id="editor-title">编辑 JSON</h2><button id="close-editor" aria-label="关闭 JSON 编辑器"><span data-icon="close"></span></button></div><p>支持修改字段名、增加 / 删除字段和调整结构。停止输入约 450 ms 后自动写回原文件；JSONL 每行填写一条 JSON，格式错误时不写入。</p><textarea id="json-editor" spellcheck="false" aria-label="JSON 源码编辑器"></textarea><p id="editor-status" class="edit-status" role="status"></p><div class="conflict-actions"><button id="discard-source">放弃未保存修改</button><button id="retry-editor">保存 / 处理冲突</button></div></dialog>
   <dialog id="conflict-dialog" aria-labelledby="conflict-title"><div class="dialog-heading"><h2 id="conflict-title">网页与原文件都有修改</h2></div><p>自动保存已暂停，两份内容均未覆盖。可以先复制网页草稿；采用原文件会放弃网页未保存修改。</p><div class="conflict-columns"><label>网页草稿<textarea id="conflict-draft" readonly spellcheck="false"></textarea></label><label>当前原文件<textarea id="conflict-disk" readonly spellcheck="false"></textarea></label></div><div class="conflict-actions"><button id="copy-conflict-draft">复制网页草稿</button><button id="keep-conflict">保留草稿，暂不保存</button><button id="use-disk">采用原文件，放弃草稿</button></div></dialog>
@@ -1317,6 +1319,47 @@ function syntaxError(error, text) {
   }
   return `JSON 格式错误：${error.message.slice(0, 180)}`;
 }
+/** 校验并打开给定文本；成功返回 true，失败提示且保留当前视图，不写历史。 */
+function openClipboardText(raw) {
+  try {
+    if (!raw.trim()) throw new Error('剪切板内容为空，请复制 JSON 后重试。');
+    const size = new Blob([raw]).size;
+    if (size > MAX_FILE_SIZE) throw new Error('剪切板内容超过 20 MB，请拆分后查看。');
+    const parsed = parseDocument(raw);
+    parsed.indexed = buildIndex(parsed.data, parsed);
+    // 先校验再确认切换，错误内容不应丢弃当前临时编辑。
+    if (!maySwitchFile()) return false;
+    generation++;
+    activate({ id: crypto.randomUUID(), name: '剪切板内容', raw, size, temporary: true, writeAllowed: true, syncEnabled: false }, parsed);
+    notice('剪切板内容仅在当前页面临时编辑，不写文件、不保存历史；离开或刷新后丢失。');
+    return true;
+  } catch (error) {
+    const message = error instanceof SyntaxError ? syntaxError(error, raw) : error.message;
+    $('clipboard-error').textContent = message;
+    notice(message + ' 当前视图保持不变。', null, true);
+    return false;
+  }
+}
+
+/** 由按钮读取剪切板，无参数和返回值；读取受限时打开手动粘贴窗口。 */
+async function openClipboard() {
+  const token = generation;
+  $('open-clipboard').disabled = true;
+  try {
+    let raw;
+    try {
+      if (!navigator.clipboard?.readText) throw new Error('当前浏览器不支持直接读取剪切板。');
+      raw = await navigator.clipboard.readText();
+    } catch {
+      if (token !== generation) return;
+      $('clipboard-error').textContent = '浏览器未允许读取剪切板，请手动粘贴。';
+      $('clipboard-dialog').showModal(); $('clipboard-input').focus();
+      return;
+    }
+    if (token === generation) openClipboardText(raw);
+  } finally { $('open-clipboard').disabled = false; }
+}
+
 async function loadFile(file, handle = null, knownRecord = null, token = ++generation) {
   if (!maySwitchFile()) return;
   if (knownRecord && removedHistoryIds.has(knownRecord.id)) return;
@@ -1655,6 +1698,10 @@ async function resumePoll() {
 }
 
 $('open-file').onclick = $('drop-zone').onclick = pickFile;
+$('open-clipboard').onclick = openClipboard;
+$('close-clipboard').onclick = () => { $('clipboard-dialog').close(); $('clipboard-input').value = ''; };
+$('clipboard-dialog').addEventListener('close', () => { $('clipboard-input').value = ''; $('clipboard-error').textContent = ''; });
+$('confirm-clipboard').onclick = () => { if (openClipboardText($('clipboard-input').value)) $('clipboard-dialog').close(); };
 $('enable-edit').onclick = grantEditing;
 $('edit-json').onclick = showSourceEditor;
 $('edit-field').onclick = () => { const node = nodes.find(node => node.id === selectedId); if (node) showEditableValue(node.index); };
