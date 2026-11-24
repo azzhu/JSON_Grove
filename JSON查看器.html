@@ -86,10 +86,11 @@ body[data-ui-style=developer] .toolbar{border-top:0}body[data-ui-style=developer
 body[data-ui-style=linear] .open-button{box-shadow:0 2px 4px #6356cc20}body[data-ui-style=linear] .brand{font-size:20px;letter-spacing:-.7px}body[data-ui-style=linear] .history-item.active{box-shadow:0 1px 4px #272d4a0a}body[data-ui-style=linear] dialog,body[data-ui-style=linear] .appearance-popover{box-shadow:0 16px 60px #272d4a20}
 body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=notion] .viewer{border-top:0;border-bottom:0}body[data-ui-style=notion] .toolbar{border-top:0;background:#fff}body[data-ui-style=notion] .history-item{border-color:transparent}body[data-ui-style=notion] .drop-zone{border-style:solid;background:transparent}
 @media(max-width:650px){.style-options{grid-template-columns:repeat(2,minmax(0,1fr))}#settings-dialog{padding:20px}.sidebar-actions{gap:8px}}@media(max-width:380px){.style-options{grid-template-columns:1fr}}@media(prefers-reduced-motion:no-preference){.style-option{transition:border-color .12s,background-color .12s}}
+.layout-fullscreen .sidebar{display:none}body.layout-fullscreen main{margin-left:0}body.layout-fullscreen .toast{left:50%}#toggle-fullscreen[aria-pressed=true]{background:var(--ui-hover);color:var(--ui-accent)}
 </style>
 </head>
 <body>
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="brand"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2218%22%20fill%3D%22%23d46a46%22%2F%3E%3Cpath%20d%3D%22M25%2016h-4c-4%200-5%203-5%207v3c0%204-2%206-5%206%203%200%205%202%205%206v3c0%204%201%207%205%207h4m14-32h4c4%200%205%203%205%207v3c0%204%202%206%205%206-3%200-5%202-5%206v3c0%204-1%207-5%207h-4%22%20fill%3D%22none%22%20stroke%3D%22%23fffaf3%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E" alt="" width="36" height="36"><span>JSON <b>Grove</b><small>数据，自有脉络。</small></span></div>
     <button class="open-button" id="open-file"><span data-icon="plus"></span> 打开 JSON / JSONL <kbd>⌘ O</kbd></button>
     <div id="notice" class="notice" role="status" hidden></div>
@@ -103,7 +104,7 @@ body[data-ui-style=notion] .brand img{filter:grayscale(1)}body[data-ui-style=not
 
   <main aria-label="JSON 查看区">
       <section class="viewer" aria-label="JSON 文件查看器" hidden>
-        <div class="toolbar"><div class="tree-controls"><button id="expand-all" title="展开全部节点"><span data-icon="expand"></span><span>全部展开</span></button><button id="collapse-all" title="折叠全部节点"><span data-icon="collapse"></span><span>全部折叠</span></button><span class="level-controls" role="group" aria-label="按层级展开"><button data-expand-level="1" title="展开到第一层字段">一级展开</button><button data-expand-level="2" title="展开到第二层字段">二级展开</button><button data-expand-level="3" title="展开到第三层字段">三级展开</button><button data-expand-level="4" title="展开到第四层字段">四级展开</button></span><span class="toolbar-divider"></span><button id="edit-json" title="编辑完整 JSON，停止输入自动保存">编辑 JSON</button><button id="edit-field" title="编辑选中节点（F2 或双击）">编辑字段</button><button id="enable-edit" title="授权读写当前原文件">授权编辑</button><button id="discard-edit" hidden>放弃未保存修改</button><button id="copy-json" title="复制完整 JSON"><span data-icon="copy"></span><span>复制</span></button></div><div class="toolbar-tools"><div class="searchbox"><span data-icon="search"></span><input id="search" type="search" placeholder="搜索字段或值…" aria-label="搜索字段或值" autocomplete="off" spellcheck="false"><span id="search-count"></span><button id="previous-match" title="上一个匹配" aria-label="上一个匹配" hidden><span data-icon="up"></span></button><button id="next-match" title="下一个匹配" aria-label="下一个匹配" hidden><span data-icon="down"></span></button><kbd id="search-hint">⌘ K</kbd></div><button id="theme-button" class="toolbar-tool" popovertarget="theme-popover" title="JSON 配色" aria-label="JSON 配色" aria-expanded="false" aria-controls="theme-popover"><span data-icon="palette"></span><span>配色</span></button><button id="font-size-button" class="toolbar-tool font-size-button" popovertarget="font-popover" title="字体大小" aria-label="调整 JSON 字体大小" aria-expanded="false" aria-controls="font-popover">A<span>a</span></button><button id="indent-button" class="toolbar-tool" popovertarget="indent-popover" title="层级缩进" aria-label="调整 JSON 层级缩进" aria-expanded="false" aria-controls="indent-popover"><span data-icon="indent"></span><span>缩进</span></button></div></div>
+        <div class="toolbar"><div class="tree-controls"><button id="expand-all" title="展开全部节点"><span data-icon="expand"></span><span>全部展开</span></button><button id="collapse-all" title="折叠全部节点"><span data-icon="collapse"></span><span>全部折叠</span></button><span class="level-controls" role="group" aria-label="按层级展开"><button data-expand-level="1" title="展开到第一层字段">一级展开</button><button data-expand-level="2" title="展开到第二层字段">二级展开</button><button data-expand-level="3" title="展开到第三层字段">三级展开</button><button data-expand-level="4" title="展开到第四层字段">四级展开</button></span><span class="toolbar-divider"></span><button id="edit-json" title="编辑完整 JSON，停止输入自动保存">编辑 JSON</button><button id="edit-field" title="编辑选中节点（F2 或双击）">编辑字段</button><button id="enable-edit" title="授权读写当前原文件">授权编辑</button><button id="discard-edit" hidden>放弃未保存修改</button><button id="copy-json" title="复制完整 JSON"><span data-icon="copy"></span><span>复制</span></button></div><div class="toolbar-tools"><div class="searchbox"><span data-icon="search"></span><input id="search" type="search" placeholder="搜索字段或值…" aria-label="搜索字段或值" autocomplete="off" spellcheck="false"><span id="search-count"></span><button id="previous-match" title="上一个匹配" aria-label="上一个匹配" hidden><span data-icon="up"></span></button><button id="next-match" title="下一个匹配" aria-label="下一个匹配" hidden><span data-icon="down"></span></button><kbd id="search-hint">⌘ K</kbd></div><button id="theme-button" class="toolbar-tool" popovertarget="theme-popover" title="JSON 配色" aria-label="JSON 配色" aria-expanded="false" aria-controls="theme-popover"><span data-icon="palette"></span><span>配色</span></button><button id="font-size-button" class="toolbar-tool font-size-button" popovertarget="font-popover" title="字体大小" aria-label="调整 JSON 字体大小" aria-expanded="false" aria-controls="font-popover">A<span>a</span></button><button id="indent-button" class="toolbar-tool" popovertarget="indent-popover" title="层级缩进" aria-label="调整 JSON 层级缩进" aria-expanded="false" aria-controls="indent-popover"><span data-icon="indent"></span><span>缩进</span></button><button id="toggle-fullscreen" class="toolbar-tool" title="隐藏侧边栏，扩宽 JSON 展示区" aria-label="全屏：隐藏侧边栏" aria-controls="sidebar" aria-pressed="false"><span data-icon="expand"></span><span>全屏</span></button></div></div>
         <div class="tree-viewport" id="tree-viewport"><div class="tree" id="tree" role="tree" aria-label="JSON 结构"></div><div class="no-results" id="no-results" hidden><span data-icon="search"></span><strong>没有找到匹配内容</strong><p>试试其他字段名或值。</p></div><button id="load-more" class="load-more" hidden>继续显示更多节点</button></div>
         <div class="viewer-footer"><div class="selected-path"><span data-icon="route"></span><span id="path-kind" title="此路径包含从 JSON 字符串解析出的节点，是展示结构中的路径" hidden>解析视图</span><button id="copy-path" title="复制选中节点的 JSONPath">$</button></div><div class="footer-info"><div class="file-meta" id="file-meta"></div><span class="structure-stats" id="structure-stats" hidden></span><button class="sync-indicator" id="sync-status" title="保存状态，点击重试或处理冲突"><i></i></button></div></div>
       </section>
@@ -1309,7 +1310,17 @@ function activate(file, parsed, keepView = false) {
     $('tree-viewport').scrollLeft = view?.scrollLeft ?? 0;
   }
 }
+/** 切换本页展示宽度；输入是否隐藏侧栏，无返回值，不修改文件或浏览状态。 */
+function setLayoutFullscreen(enabled) {
+  document.body.classList.toggle('layout-fullscreen', enabled);
+  $('toggle-fullscreen').setAttribute('aria-pressed', String(enabled));
+  $('toggle-fullscreen').setAttribute('aria-label', enabled ? '全屏：显示侧边栏' : '全屏：隐藏侧边栏');
+  $('toggle-fullscreen').title = enabled ? '显示侧边栏，退出全屏布局' : '隐藏侧边栏，扩宽 JSON 展示区';
+  closeAppearancePopovers();
+}
+
 function clearViewer() {
+  setLayoutFullscreen(false);
   closeAppearancePopovers();
   generation++;
   clearTimeout(pollTimer); clearTimeout(inputTimer); clearTimeout(editSession?.saveTimer); clearTimeout(searchTimer);
@@ -1728,6 +1739,7 @@ $('open-clipboard').onclick = openClipboard;
 $('close-clipboard').onclick = () => { $('clipboard-dialog').close(); $('clipboard-input').value = ''; };
 $('clipboard-dialog').addEventListener('close', () => { $('clipboard-input').value = ''; $('clipboard-error').textContent = ''; });
 $('confirm-clipboard').onclick = () => { if (openClipboardText($('clipboard-input').value)) $('clipboard-dialog').close(); };
+$('toggle-fullscreen').onclick = () => setLayoutFullscreen($('toggle-fullscreen').getAttribute('aria-pressed') !== 'true');
 $('enable-edit').onclick = grantEditing;
 $('edit-json').onclick = showSourceEditor;
 $('edit-field').onclick = () => { const node = nodes.find(node => node.id === selectedId); if (node) showEditableValue(node.index); };
